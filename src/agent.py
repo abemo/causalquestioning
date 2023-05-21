@@ -56,7 +56,7 @@ class Agent:
 
   def get_ind_var_value(self, ind_var):
     """
-    Returns the assignment of the givent
+    Returns the assignment of the given
     "indepedent variable."
     """
     if ind_var == "tau":
@@ -107,7 +107,7 @@ class Agent:
   def choose(self, givens):
     """
     Defines the logic of how the agent
-    'chooses' according their Action 
+    'chooses' according to their Action 
     Selection Rule (ASR).
     """
     if self.asr == ASR.EG:
@@ -166,7 +166,7 @@ class Agent:
 
   def choose_random(self):
     """
-    Randomly chooses from the possible acti
+    Randomly chooses from the possible actions
     """
     return self.rng.choice(self.actions)
 
