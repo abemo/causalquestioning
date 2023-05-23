@@ -74,12 +74,12 @@ class Agent:
     else:
       return ""
 
-  def eg(self, givens):
+  def epsilon_greedy(self, givens):
     if self.rng.random() < self.epsilon:
       return self.choose_random()
     return self.choose_optimal(givens)
 
-  def ef(self, givens):
+  def epsilon_first(self, givens):
     if self.contexts:
       given_i = self.contexts.index(givens)
       if self.rand_trials_rem[given_i] > 0:
@@ -90,7 +90,7 @@ class Agent:
       return self.choose_random()
     return self.choose_optimal(givens)
 
-  def ed(self, givens):
+  def epsilon_decreasing(self, givens):
     if self.contexts:
       given_i = self.contexts.index(givens)
       if self.rng.random() < self.epsilon[given_i]:
@@ -111,11 +111,11 @@ class Agent:
     Selection Rule (ASR).
     """
     if self.asr == ASR.EG:
-      return self.eg(givens)
+      return self.epsilon_greedy(givens)
     elif self.asr == ASR.EF:
-      return self.ef(givens)
+      return self.epsilon_first(givens)
     elif self.asr == ASR.ED:
-      return self.ed(givens)
+      return self.epsilon_decreasing(givens)
     elif self.asr == ASR.TS:
       return self.thompson_sample(givens)
     else:
