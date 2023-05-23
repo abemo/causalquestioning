@@ -3,8 +3,8 @@ Defines the absolute top-level behavior of the project. This is the python file 
 Simulation parameters can be set where a Sim object is created and called.
 """
 from enum import Enum
-from assignment_models import ActionModel, DiscreteModel, RandomModel
-from environment import Environment
+from causal_tools.assignment_models import ActionModel, DiscreteModel, RandomModel
+from agent.environment import Environment
 import plotly.graph_objs as go
 import time
 from numpy.random import randint, default_rng
@@ -12,7 +12,7 @@ import multiprocessing as mp
 from pandas import DataFrame, ExcelWriter
 from os import mkdir
 from json import dump
-from enums import OTP, ASR
+from causal_tools.enums import OTP, ASR
 from process import Process
 from itertools import combinations_with_replacement
 
@@ -218,7 +218,7 @@ class Sim:
   def display_and_save(self, results, desc):
     """
     Taking in a 'results' pandas Dataframe and a description of the results,
-    outputs a 
+    outputs a
     """
     cpr_plot = self.get_cpr_plot(results[0], desc)
     poa_plot = self.get_poa_plot(results[1], desc)

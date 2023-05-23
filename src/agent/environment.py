@@ -10,9 +10,9 @@ The code has been imported and modified into this project for ease/consistency
 
 from util import hash_from_dict, only_given_keys, permutations
 from math import inf
-from scm import StructuralCausalModel
-from cgm import CausalGraph
-from assignment_models import ActionModel
+from causal_tools.scm import StructuralCausalModel
+from causal_tools.cgm import CausalGraph
+from causal_tools.assignment_models import ActionModel
 
 
 class Environment:

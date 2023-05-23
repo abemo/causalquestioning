@@ -3,10 +3,10 @@ Defines the Agent class and its inheritors (SoloAgent, NaiveAgent, SensitiveAgen
 """
 
 from copy import deepcopy
-from cpt import CPT
+from causal_tools.cpt import CPT
 from query import Count, Product, Query
 from util import only_given_keys, permutations, hellinger_dist
-from enums import ASR
+from causal_tools.enums import ASR
 from math import inf
 
 
@@ -107,7 +107,7 @@ class Agent:
   def choose(self, givens):
     """
     Defines the logic of how the agent
-    'chooses' according to their Action 
+    'chooses' according to their Action
     Selection Rule (ASR).
     """
     if self.asr == ASR.EG:
@@ -123,7 +123,7 @@ class Agent:
 
   def observe(self, sample):
     """
-    The behavior of the agent returning 
+    The behavior of the agent returning
     """
     self.recent = sample
     for cpt in self.my_cpts.values():

@@ -10,8 +10,8 @@ The code has been imported and modified into this project for ease/consistency
 """
 
 import networkx as nx
-from cgm import CausalGraph
-from assignment_models import ActionModel
+from causal_tools.cgm import CausalGraph
+from causal_tools.assignment_models import ActionModel
 
 
 class StructuralCausalModel:

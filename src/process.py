@@ -3,13 +3,13 @@ Defines the behavior of the process which run simulations. Multiple processes
 run in parallel to get averaged results.
 """
 
-from agent import SoloAgent, NaiveAgent, SensitiveAgent, AdjustAgent
-from world import World
+from agent.agent import SoloAgent, NaiveAgent, SensitiveAgent, AdjustAgent
+from agent.world import World
 from util import printProgressBar
-from environment import Environment
+from agent.environment import Environment
 import time
 from itertools import cycle
-from enums import OTP
+from causal_tools.enums import OTP
 
 
 class Process:

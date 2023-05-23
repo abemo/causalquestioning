@@ -1,10 +1,10 @@
 """
 Defines the World class, which constitutes the environment agents interact in for a single
-simulation. All agents and their environments exist in a World, and this class is used to 
+simulation. All agents and their environments exist in a World, and this class is used to
 store results to be returned to the process and simulation at the end of execution.
 """
 
-from agent import SensitiveAgent, AdjustAgent
+from agent.agent import SensitiveAgent, AdjustAgent
 from util import only_given_keys
 
 
