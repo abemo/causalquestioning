@@ -1,5 +1,5 @@
 """
-Defines the Agent class and its inheritors (SoloAgent, NaiveAgent, SensitiveAgent, AdjustAgent)
+Defines the Agent class and its inheritors (SoloAgent, AdjustAgent)
 """
 
 from copy import deepcopy
