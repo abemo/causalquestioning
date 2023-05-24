@@ -30,7 +30,7 @@
 - `environment_dicts`
 	- required even if environments are randomized since this also defines causal structure and the number of agents in the world
 - `otp`
-	- one of, or a combination of `OTP.SOLO`, `OTP.NAIVE`, `OTP.SENSITIVE`, `OTP.ADJUST`
+	- one of, or a combination of `OTP.SOLO`, `OTP.ADJUST`
 - `asr`
 	- one of, or a combination of `ASR.EG` `ASR.EF`, `ASR.ED`, `ASR.TS`
 	- to test different "communities", you can also define a 2D tuple/list:
@@ -69,8 +69,6 @@
 Defines agent classes and their behaviors.
 - `Agent` - a superclass for the following classes
 - `SoloAgent`
-- `NaiveAgent`
-- `SensitiveAgent`
 - `AdjustAgent` 
 ### `assignment_models.py`
 Defines assignment models, which describe the behavior of certain nodes in an SCM. These include:

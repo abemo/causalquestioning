@@ -302,7 +302,7 @@ if __name__ == "__main__":
 
   experiment = Sim(
       environment_dicts=(baseline, reversed_w, baseline, reversed_w),
-      otp=OTP.ADJUST,  # (OTP.SOLO,OTP.NAIVE, OTP.SENSITIVE, OTP.ADJUST),
+      otp=OTP.SOLO,  # (OTP.SOLO, OTP.ADJUST),
       # (ASR.EG, ASR.EF, ASR.ED, ASR.TS),
       asr=combinations_with_replacement((ASR.TS, ASR.EF), 4),
       T=100,
