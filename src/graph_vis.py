@@ -1,10 +1,15 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from pandas import ExcelFile
 
 DIR_NAME = 'DIR_NAME'
 G = nx.Graph()
 
 if __name__ == '__main__':
+    directory = '../output/%s' % DIR_NAME
+    ex_file = '/%s.xlsx' % 'poa'
+    results = ExcelFile(directory + ex_file).parse(sheet_name=None, index_col=0)
+
     # Create an empty directed graph
     scm_graph = nx.DiGraph()
 
