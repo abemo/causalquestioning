@@ -211,20 +211,6 @@ class SoloAgent(Agent):
     return self.my_cpts
 
 
-class NaiveAgent(Agent):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-
-  def get_cpts(self):
-    cpts = deepcopy(self.my_cpts)
-    for n in cpts:
-      for a in self.agents:
-        if a == self:
-          continue
-        cpts[n].update(a.my_cpts[n])
-    return cpts
-
-
 class SensitiveAgent(Agent):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)

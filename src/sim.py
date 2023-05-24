@@ -305,7 +305,7 @@ if __name__ == "__main__":
       otp=OTP.ADJUST,  # (OTP.SOLO,OTP.NAIVE, OTP.SENSITIVE, OTP.ADJUST),
       # (ASR.EG, ASR.EF, ASR.ED, ASR.TS),
       asr=combinations_with_replacement((ASR.TS, ASR.EF), 4),
-      T=3000,
+      T=100,
       mc_sims=8,
       tau=0.05,
       EG_epsilon=100/3000,
