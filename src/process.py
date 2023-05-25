@@ -3,7 +3,8 @@ Defines the behavior of the process which run simulations. Multiple processes
 run in parallel to get averaged results.
 """
 
-from agent.agent import SoloAgent, SensitiveAgent, AdjustAgent
+# from agent.agent import SoloAgent, SensitiveAgent, AdjustAgent
+from agent.agent import SoloAgent, AdjustAgent
 from agent.world import World
 from util import printProgressBar
 from agent.environment import Environment

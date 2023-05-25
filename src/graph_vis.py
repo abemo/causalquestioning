@@ -1,3 +1,5 @@
+# https://networkx.org/documentation/stable/tutorial.html
+
 import networkx as nx
 import matplotlib.pyplot as plt
 from pandas import ExcelFile
@@ -9,6 +11,9 @@ if __name__ == '__main__':
     directory = '../output/%s' % DIR_NAME
     ex_file = '/%s.xlsx' % 'poa'
     results = ExcelFile(directory + ex_file).parse(sheet_name=None, index_col=0)
+    
+    for i, ind_var in enumerate(sorted(results)):
+        print(ind_var)
 
     # Create an empty directed graph
     scm_graph = nx.DiGraph()

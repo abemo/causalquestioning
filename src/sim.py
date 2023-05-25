@@ -109,7 +109,7 @@ class Sim:
   def sim_process(self, results, index):
     proc = Process(**self.process_args(index))
     results[index] = proc.simulate()
-    return
+    
 
   def combine_results(self, process_results):
     results = [{}, {}]
@@ -305,7 +305,7 @@ if __name__ == "__main__":
       otp=OTP.SOLO,  # (OTP.SOLO, OTP.ADJUST),
       # (ASR.EG, ASR.EF, ASR.ED, ASR.TS),
       asr=combinations_with_replacement((ASR.TS, ASR.EF), 4),
-      T=100,
+      T=10,
       mc_sims=8,
       tau=0.05,
       EG_epsilon=100/3000,

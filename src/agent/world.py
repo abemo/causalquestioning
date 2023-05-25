@@ -4,7 +4,8 @@ simulation. All agents and their environments exist in a World, and this class i
 store results to be returned to the process and simulation at the end of execution.
 """
 
-from agent.agent import SensitiveAgent, AdjustAgent
+# from agent.agent import SensitiveAgent, AdjustAgent
+from agent.agent import AdjustAgent
 from util import only_given_keys
 
 
@@ -14,7 +15,7 @@ class World:
     self.cpr = {a: [0] * T for a in self.agents}
     self.poa = {a: [0] * T for a in self.agents}
     self.has_sensitive = any(
-        [isinstance(a, (SensitiveAgent, AdjustAgent)) for a in self.agents])
+        [isinstance(a, (AdjustAgent)) for a in self.agents])
 
   def run_episode(self, ep):
     for a in self.agents:

@@ -253,9 +253,12 @@ class SensitiveAgent(Agent):
     return self.tau * scale_factor
 
 
-class AdjustAgent(SensitiveAgent):
+class AdjustAgent(Agent):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
+    # May want to include all ancestors of X, not just parents
+    self.context_vars = set(self.get_context().keys())
+    self.divergence = dict()
 
   def get_cpts(self):
     cpts = deepcopy(self.my_cpts)
@@ -267,6 +270,34 @@ class AdjustAgent(SensitiveAgent):
         if n not in div_nodes:
           cpts[n].update(a.my_cpts[n])
     return cpts
+
+  #from SensitiveAgent
+  def get_non_act_nodes(self): 
+    return {node for node in self.domains if node != self.act_var}
+  
+  #from SensitiveAgent
+  def update_divergence(self):
+    for a in self.agents:
+      if a == self:
+        continue
+      if a not in self.divergence:
+        self.divergence[a] = {n: inf for n in self.cgm.get_unset_nodes()}
+      for n in self.get_non_act_nodes():
+        self.divergence[a][n] = hellinger_dist(
+            self.domains, self.my_cpts[n], a.my_cpts[n], self.cgm.get_node_dist(n))
+  
+  #from SensitiveAgent
+  def div_nodes(self, agent):
+    if self == agent:
+      return set()
+    return {node for node, dist in self.divergence[agent].items() if dist is None or dist > self.get_scaled_tau(node)}
+
+  #from SensitiveAgent
+  def get_scaled_tau(self, node):
+    scale_factor = 1
+    for parent in self.cgm.get_parents(node):
+      scale_factor *= len(self.domains[parent])
+    return self.tau * scale_factor
 
   def expected_rew(self, givens, cpts):
     query = self.get_rew_query().assign(givens)
