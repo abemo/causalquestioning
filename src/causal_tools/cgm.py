@@ -8,7 +8,7 @@ Much of this file/class was written by Iain Barr (#ijmbarr on GitHub)
 from his public repository, causalgraphicalmodels, which is registered with the MIT License.
 The code has been imported and modified into this project for ease/consistency
 """
-
+import os
 import networkx as nx
 import graphviz
 from itertools import combinations, chain
@@ -131,7 +131,7 @@ class CausalGraph:
     return path_nodes
 
   def draw_model(self, v=True):
-    self.draw().render('output/causal-model.gv', view=v)
+    self.draw().render(f'{os.path.dirname(__file__)}/../../output/causal-model.gv', view=v)
 
   def draw(self):
     """
@@ -358,7 +358,7 @@ class CausalGraph:
   def get_all_backdoor_adjustment_sets(self, x, y):
     """
     Get all sets of variables which are valid adjustment sets for
-    estimating the causal impact of x on y via the back door 
+    estimating the causal impact of x on y via the back door
     adjustment formula:
 
     P(y|do(x)) = \sum_{z}P(y|x,z)P(z)
@@ -370,8 +370,8 @@ class CausalGraph:
 
     Arguments
     ---------
-    x: str 
-      Intervention Variable 
+    x: str
+      Intervention Variable
     y: str
       Target Variable
 
