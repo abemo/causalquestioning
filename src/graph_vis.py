@@ -11,7 +11,8 @@ if __name__ == '__main__':
     directory = '../output/%s' % DIR_NAME
     ex_file = '/%s.xlsx' % 'poa'
     results = ExcelFile(directory + ex_file).parse(sheet_name=None, index_col=0)
-    
+    # node_list = [{name, edges} for name, edges in results.items()}]
+
     for i, ind_var in enumerate(sorted(results)):
         print(ind_var)
 
