@@ -91,4 +91,14 @@ class StructuralCausalModel:
       shannon_entropy += prob * math.log((1 / prob), base)
     return shannon_entropy
   
+  def total_entropy(self):
+    """
+    Returns the total entropy of the model
+    """
+    total_entropy = 0
+    for node in self.assignment:
+      if isinstance(self.assignment[node], ActionModel):
+        total_entropy += self.node_entropy(self.assignment[node].prob_dist)
+    return total_entropy
+  
 
