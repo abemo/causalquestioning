@@ -12,6 +12,15 @@ import scm
 from random import randint, choice
 
 
+"""
+TODO:
+How do we know which node(s) and edge(s) to query?
+ --we can get this using entropy? but same problem as the entropy function, how do we access the nodes and edges?
+Should each type of question be a class? 
+ --this is what I did, but im not sure if it is the best way
+Each question type class should have its own answer method
+"""
+
 class CausalQuestion:
     def __init__(self, nodes: list):
         self.nodes = nodes
@@ -23,37 +32,64 @@ class CausalQuestion:
         self.possible_queries.append(self.AddNodeQ(node))
 
     def best_query(self):
-        return max(self.possible_queries, key=lambda q: q.entropy)
+        """
+        return the query which results in the lowest entropy model
+        """
+        return min(self.possible_queries, key=lambda q: q.entropy)
         
 
 class Question:
     def __init__(self, type: str, node, edge):
         self.node = node
         self.edge = edge
+    
+    def answer(self):
+        """
+        answer the question
+        """
+        return "answer type not defined"
 
     
-    class RemoveEdgeQ:
-        def __init__(self, node, edge):
-            self.node = node
-            self.edge = edge
+    class RemoveEdgeQ():
+        def __init__(self, edge):
+            super.__init__(edge)
+        
+        def answer(self):
+            #TODO
+            pass
             
-    class AddEdgeQ:
-        def __init__(self, node, edge):
-            self.node = node
-            self.edge = edge
+    class AddEdgeQ():
+        def __init__(self, edge):
+            super.__init__(edge)
+
+        def answer(self):
+            #TODO
+            pass
 
     class SetNodeQ:
         def __init__(self, node, set_value=randint.choice([0, 1])):
-            self.node = node
-            self.set_values = set_value
-    
+            super.__init__(node)
+            self.set_value = set_value
+        
+        def answer(self):
+            #TODO
+            pass
+
     class RemoveNodeQ:
         def __init__(self, node):
-            self.node = node
+            super.__init__(node)
+
+        def answer(self):
+            #TODO
+            pass
 
     class AddNodeQ:
-        def __init__(self, node):
-            self.node = node
+        def __init__(self, node, location):
+            super.__init__(node)
+            self.location = location
 
+        def answer(self):
+            #TODO
+            pass
 
 
