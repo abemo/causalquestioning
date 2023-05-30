@@ -91,7 +91,7 @@ class StructuralCausalModel:
       shannon_entropy += prob * math.log((1 / prob), base)
     return shannon_entropy
   
-  def total_entropy(self):
+  def total_entropy(self) -> float:
     """
     Returns the total entropy of the model
     """
