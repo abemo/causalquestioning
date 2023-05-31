@@ -3,7 +3,6 @@ Defines the behavior of the process which run simulations. Multiple processes
 run in parallel to get averaged results.
 """
 
-# from agent.agent import SoloAgent, SensitiveAgent, AdjustAgent
 from agent.agent import SoloAgent, AdjustAgent
 from agent.world import World
 from util import printProgressBar
@@ -33,8 +32,6 @@ class Process:
     otp = assignments.pop("otp")
     if otp == OTP.SOLO:
       return SoloAgent(self.rng, name, environment, agents, **assignments)
-    elif otp == OTP.SENSITIVE:
-      return SensitiveAgent(self.rng, name, environment, agents, **assignments)
     elif otp == OTP.ADJUST:
       return AdjustAgent(self.rng, name, environment, agents, **assignments)
     else:

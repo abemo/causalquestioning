@@ -8,7 +8,6 @@ from enum import Enum
 
 class OTP(Enum):
   ADJUST = "Adjust"
-  SENSITIVE = "Sensitive"
   SOLO = "Solo"
 
   def __lt__(self, other):

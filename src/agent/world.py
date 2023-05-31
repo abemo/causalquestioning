@@ -4,7 +4,6 @@ simulation. All agents and their environments exist in a World, and this class i
 store results to be returned to the process and simulation at the end of execution.
 """
 
-# from agent.agent import SensitiveAgent, AdjustAgent
 from agent.agent import AdjustAgent
 from util import only_given_keys
 
