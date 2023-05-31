@@ -81,24 +81,6 @@ class StructuralCausalModel:
     new_assignment[node] = None
     return StructuralCausalModel(new_assignment)
   
-  def node_entropy(self, prob_dist, base: int = 2) -> float:
-    """
-    Returns the Shannon Entropy of a given node
-    Base is defaulted to 2 for binary decision problems, but can be set to other values
-    """
-    shannon_entropy = 0
-    for prob in prob_dist: 
-      shannon_entropy += prob * math.log((1 / prob), base)
-    return shannon_entropy
   
-  def total_entropy(self) -> float:
-    """
-    Returns the total entropy of the model
-    """
-    total_entropy = 0
-    for node in self.assignment:
-      if isinstance(self.assignment[node], ActionModel):
-        total_entropy += self.node_entropy(self.assignment[node].prob_dist)
-    return total_entropy
   
 
