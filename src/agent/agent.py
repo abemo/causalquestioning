@@ -207,10 +207,20 @@ class Agent:
 class AskAgent(Agent):
   def __init__(self, dag, *args, **kwargs):
     super().__init__(*args, **kwargs)
+    self.name = "Unique Identifier" #TODO: make this a unique identifier
     self.dag = dag
 
   def ask():
     pass
+
+  def __hash_askagent__(self):
+    return hash(self.name)
+  
+  def __hash_dag__(self):
+    return hash(self.dag)
+  
+  def __eq__(self, other):
+    return self.__hash_askagent__() == other.__hash_askagent__() and self.__hash_dag__() == other.__hash_dag__()
 
 
 class SoloAgent(Agent):
