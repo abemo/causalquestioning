@@ -6,6 +6,9 @@ import os
 
 class DAG:
     def __init__(self, nodes, edges, cpts):
+        """
+        TODO: figure out how best to store CPTs, and update entropy calculations accordingly
+        """
         self.graph = nx.DiGraph()
         self.graph.add_nodes_from(nodes)
         self.graph.add_edges_from(edges)
@@ -22,7 +25,7 @@ class DAG:
         Base is defaulted to 2 for binary decision problems, but can be set to other values
         """
         shannon_entropy = 0
-        for prob in self.cpts[node]: 
+        for prob in self.cpts[node].probabilities(): 
             shannon_entropy += prob * math.log((1 / prob), base)
         return shannon_entropy
   

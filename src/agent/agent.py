@@ -8,6 +8,7 @@ from query import Count, Product, Query
 from util import only_given_keys, permutations, hellinger_dist
 from causal_tools.enums import ASR
 from math import inf
+from causal_tools.dag import DAG
 
 
 class Agent:
@@ -201,6 +202,12 @@ class Agent:
   def __eq__(self, other):
     return isinstance(other, self.__class__) \
         and self.name == other.name
+
+
+class AskAgent(Agent):
+  def __init__(self, nodes, edges, cpts, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.dag = DAG(nodes, edges, cpts)
 
 
 class SoloAgent(Agent):
