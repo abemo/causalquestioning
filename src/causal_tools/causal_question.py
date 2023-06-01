@@ -11,75 +11,86 @@
 import scm
 from random import randint, choice
 import dag
+import agent
 
 
 class Question:
-    def __init__(self, dag):
+    def __init__(self, dag, number_of_questions=3):
         self.dag = dag
-        self.possible_queries = []
+        self.possible_questions = []
+        self.questions = [self.choose_question() for _ in range(number_of_questions)]
 
+
+    def add_questions(self, agent, edge=None, node=None):
+        """
+        For now just brute force, add all possible questions to possible_questions
+        """
+        if edge:
+            self.remove_edge_q(agent,edge)
+            self.add_edge_q(agent,edge)
+            self.reverse_edge(agent,edge)
+        elif node:
+            self.remove_node_q(agent, node)
+            self.add_node_q(agent, node)
+            self.set_node_q(agent, node)
+        else:
+            raise Exception("Not given an Edge or Node")
     
     def choose_question(self):
         """
-        choose a question to ask
+        choose a question to ask and spin off daemon
         """
-        return choice(self.possible_queries)
+        question = choice(self.possible_questions)
+        #run daemon on question
+        # daemon(current agent, question)
+        self.possible_questions.remove(question)
+        return question
 
-    def answer(self):
-        """
-        answer the question
-        """
-        return "question type not defined"
+
+    #TODO: start with only add adge, 
+    # start with every node as an island, than the daemons try to connect them in the right direction
+    # we should observe the entropy of the node being pointed to (does adding this effect help us understand the effect we're observing)
 
     
-    class RemoveEdgeQ():
-        def __init__(self, edge):
-            super.__init__(edge)
-        
-        def answer(self):
-            #TODO
-            pass
-            
-    class AddEdgeQ():
-        def __init__(self, edge):
-            super.__init__(edge)
+    # def remove_edge_q(self, agent, edge):
+    #    #TODO: check if a legal question
+    #    cloned_agent = agent.clone() #TODO: implement agent.clone that truly clones
+    #    cloned_agent.dag.remove_edge(edge)
+    #    self.possible_questions.append(cloned_agent)
 
-        def answer(self):
-            #TODO
-            pass
 
-    class ReverseEdgeQ():
-        def __init__(self, edge):
-            super.__init__(edge)
+    # def add_edge_q(self, agent, edge):
+    #     #TODO: check if a legal question
+    #     cloned_agent = agent.clone()
+    #     cloned_agent.dag.add_edge(edge)
+    #     self.possible_questions.append(cloned_agent)
 
-        def answer(self):
-            #TODO
-            pass
 
-    class SetNodeQ:
-        def __init__(self, node, set_value=randint.choice([0, 1])):
-            super.__init__(node)
-            self.set_value = set_value
-        
-        def answer(self):
-            #TODO
-            pass
+    # def reverse_edge_q(self,agent, edge):
+    #     #TODO: check if a legal question
+    #     reversed_edge = (edge[1], edge[0])
+    #     cloned_agent = agent.clone()
+    #     cloned_agent.dag.remove_edge(edge)
+    #     cloned_agent.dag.add_edge(reversed_edge)
+    #     self.possible_questions.append(cloned_agent)
+    
 
-    class RemoveNodeQ:
-        def __init__(self, node):
-            super.__init__(node)
+    # def set_node_q(self,agent, node): #intervene on that node
+    #     #TODO: check if a legal question
+    #     pass
 
-        def answer(self):
-            #TODO
-            pass
 
-    class AddNodeQ:
-        def __init__(self, node, location):
-            super.__init__(node)
-            self.location = location
+    # def remove_node_q(self,agent, node):
+    #     #TODO: check if a legal question
+    #     cloned_agent = agent.clone()
+    #     cloned_agent.dag.remove_node(node) #TODO: add a method to dag.py that removes a node, its cpt and all edges connected to it
+    #     self.possible_questions.append(cloned_agent)
 
-        def answer(self):
-            #TODO
-            pass
+
+    # def add_node_q(self,agent, node, cpt, edges):
+    #     #TODO: check if a legal question
+    #     cloned_agent = agent.clone()
+    #     cloned_agent.dag.add_node(node, cpt, edges) #TODO add a method to dag.py that adds a node, its cpt and all edges connected to it
+    #     self.possible_questions.append(cloned_agent)
 
 

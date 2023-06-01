@@ -18,7 +18,7 @@ class DAG:
         self.graph = nx.DiGraph()
         self.graph.add_nodes_from(nodes)
         self.graph.add_edges_from(edges)
-        self.cpts = {}
+        self.cpts = {} #TODO: way to generate the cpts from the data
         for node, cpt in zip(nodes, cpts):
             self.cpts[node] = cpt
 
@@ -61,6 +61,24 @@ class DAG:
                 highest_entropy = self.node_entropy(node)
                 highest_entropy_node = node
         return highest_entropy_node
+    
+    def remove_node():
+        pass
+
+    def add_node():
+        pass
+    
+    def set_node():
+        pass
+
+    def remove_edge():
+        pass
+
+    def add_edge():
+        pass
+
+    def update_cpts():
+        pass
     
     def __hash_graph__(self) -> int:
         return hash(self.graph)
