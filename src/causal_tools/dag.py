@@ -36,7 +36,7 @@ class DAG:
         Base is defaulted to 2 for binary decision problems, but can be set to other values
         """
         shannon_entropy = 0
-        for prob in self.cpts[node].probabilities(): 
+        for prob in self.cpts[node][-1]: #TODO how to get last column of array!!!!!! 
             shannon_entropy += prob * math.log((1 / prob), base)
         return shannon_entropy
   
@@ -72,6 +72,18 @@ class DAG:
     
 
 if __name__ == "__main__":
-    cpts = np.array([[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]])
+    """
+    Example usage of the DAG class,
+    as well as example of cpt format
+    """
+    cpts = np.array([[[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]],
+            [[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]],
+            [[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]],
+            [[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]],
+            [[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]],
+    ])
     dag = DAG(["A", "B", "C", "D", "E"], [("A", "B"), ("A", "C"), ("B", "D"), ("C", "D"), ("D", "E")], cpts)
     dag.draw_model()
+    print(dag.cpts["A"])
+    print(dag.node_entropy("A"))
+    print(dag.total_entropy())

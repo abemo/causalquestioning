@@ -205,9 +205,9 @@ class Agent:
 
 
 class AskAgent(Agent):
-  def __init__(self, nodes, edges, cpts, *args, **kwargs):
+  def __init__(self, dag, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self.dag = DAG(nodes, edges, cpts)
+    self.dag = dag
 
 
 class SoloAgent(Agent):
