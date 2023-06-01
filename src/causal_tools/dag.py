@@ -74,8 +74,8 @@ class DAG:
     def remove_edge():
         pass
 
-    def add_edge():
-        pass
+    def add_edge(edge):
+        self.graph.add_edge(edge)
 
     def update_cpts():
         pass
