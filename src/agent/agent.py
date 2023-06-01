@@ -209,6 +209,9 @@ class AskAgent(Agent):
     super().__init__(*args, **kwargs)
     self.dag = dag
 
+  def ask():
+    pass
+
 
 class SoloAgent(Agent):
   def __init__(self, *args, **kwargs):

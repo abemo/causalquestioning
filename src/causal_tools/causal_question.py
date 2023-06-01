@@ -10,6 +10,7 @@
 
 import scm
 from random import randint, choice
+import dag
 
 
 """

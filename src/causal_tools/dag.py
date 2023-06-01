@@ -24,8 +24,9 @@ class DAG:
 
     def draw_model(self, v=True):
         dot = graphviz.Digraph()
+        dot.graph_attr['label'] = f"Total Entropy: {self.total_entropy()}"
         for node in self.graph.nodes():
-            dot.node(node)
+            dot.node(node, f"{node}\n{self.node_entropy(node)}")
         for edge in self.graph.edges():
             dot.edge(edge[0], edge[1])
         dot.render(f'{os.path.dirname(__file__)}/../../output/causal-model.gv', view=v)
@@ -36,7 +37,7 @@ class DAG:
         Base is defaulted to 2 for binary decision problems, but can be set to other values
         """
         shannon_entropy = 0
-        for prob in self.cpts[node][-1]: #TODO how to get last column of array!!!!!! 
+        for prob in self.cpts[node][-1]: 
             shannon_entropy += prob * math.log((1 / prob), base)
         return shannon_entropy
   
