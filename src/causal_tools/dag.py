@@ -46,3 +46,12 @@ class DAG:
                 highest_entropy = self.node_entropy(node)
                 highest_entropy_node = node
         return highest_entropy_node
+    
+    def __hash_graph__(self) -> int:
+        return hash(self.graph)
+    
+    def __hash_cpts__(self) -> int:
+        return hash(tuple(self.cpts))
+    
+    def __eq__(self, __value: object) -> bool:
+        return self.__hash_graph__() == __value.__hash_graph__() and self.__hash_cpts__() == __value.__hash_cpts__()
