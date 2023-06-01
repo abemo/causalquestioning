@@ -3,11 +3,17 @@ import matplotlib.pyplot as plt
 import math 
 import graphviz
 import os
+import pydot
+import numpy as np
+
 
 class DAG:
     def __init__(self, nodes, edges, cpts):
         """
-        TODO: figure out how best to store CPTs, and update entropy calculations accordingly
+        nodes: list of nodes in the graph
+        edges: list of edges in the graph
+        cpts: a numpy ndarray of the conditional probability tables, with a column for each variable,
+            where the last column is the probabilities
         """
         self.graph = nx.DiGraph()
         self.graph.add_nodes_from(nodes)
@@ -17,7 +23,12 @@ class DAG:
             self.cpts[node] = cpt
 
     def draw_model(self, v=True):
-        self.graph.render(f'{os.path.dirname(__file__)}/../../output/causal-model.gv', view=v)
+        dot = graphviz.Digraph()
+        for node in self.graph.nodes():
+            dot.node(node)
+        for edge in self.graph.edges():
+            dot.edge(edge[0], edge[1])
+        dot.render(f'{os.path.dirname(__file__)}/../../output/causal-model.gv', view=v)
 
     def node_entropy(self, node, base: int = 2) -> float:
         """
@@ -58,3 +69,9 @@ class DAG:
     
     def __eq__(self, __value: object) -> bool:
         return self.__hash_graph__() == __value.__hash_graph__() and self.__hash_cpts__() == __value.__hash_cpts__()
+    
+
+if __name__ == "__main__":
+    cpts = np.array([[False, False, True, True], [False, True, False, True], [0.7, 0.3, 0.2, 0.8]])
+    dag = DAG(["A", "B", "C", "D", "E"], [("A", "B"), ("A", "C"), ("B", "D"), ("C", "D"), ("D", "E")], cpts)
+    dag.draw_model()
