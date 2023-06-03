@@ -1,6 +1,6 @@
 """
 1) formulate question --> do in constructor
-    node 
+    node
     edge
     set_values
 2) strategize how to answer
@@ -35,7 +35,7 @@ class Question:
             self.set_node_q(agent, node)
         else:
             raise Exception("Not given an Edge or Node")
-    
+
     def choose_question(self):
         """
         choose a question to ask and spin off daemon
@@ -46,12 +46,20 @@ class Question:
         self.possible_questions.remove(question)
         return question
 
+    def run_daemons(self):
+        for daemon in self.possible_questions:
+            pass
+            # daemon.run(new_info)
+            # if daemon.age > environment.daemon_death_age:
+                # self.possible_questions.remove(daemon)
+            # if calculate_entropy(daemon.pointed_to_node) > environment.entropy_threshhold
 
-    #TODO: start with only add adge, 
+
+    #TODO: start with only add adge,
     # start with every node as an island, than the daemons try to connect them in the right direction
     # we should observe the entropy of the node being pointed to (does adding this effect help us understand the effect we're observing)
 
-    
+
     # def remove_edge_q(self, agent, edge):
     #    #TODO: check if a legal question
     #    cloned_agent = agent.clone() #TODO: implement agent.clone that truly clones
@@ -73,7 +81,7 @@ class Question:
     #     cloned_agent.dag.remove_edge(edge)
     #     cloned_agent.dag.add_edge(reversed_edge)
     #     self.possible_questions.append(cloned_agent)
-    
+
 
     # def set_node_q(self,agent, node): #intervene on that node
     #     #TODO: check if a legal question

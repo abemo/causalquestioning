@@ -27,6 +27,7 @@ class Process:
     self.rand_envs = rand_envs
     self.domains = domains
     self.act_var = act_var
+    self.daemons = set()
 
   def agent_maker(self, name, environment, assignments, agents):
     otp = assignments.pop("otp")
@@ -69,6 +70,19 @@ class Process:
         agents.append(self.agent_maker(i, next(envs), assignments.pop(), agents))
       yield World(agents, self.T)
 
+  def check_for_questions(self):
+    # if there is a question to be asked, check if it's been asked and
+    # if it hasn't add the question to self.daemons
+    # this will be done via checking the environments
+    pass
+
+  def run_daemons(self):
+        for daemon in self.daemons:
+            daemon.simulate()
+            # if daemon.age > environment.daemon_death_age:
+                # self.possible_questions.remove(daemon)
+            # if calculate_entropy(daemon.pointed_to_node) > environment.entropy_threshhold
+
   def simulate(self):
     res = [{}, {}]
     sim_time = []
@@ -88,6 +102,8 @@ class Process:
               suffix=time_rem_str,
           )
         self.update_process_result(res, world)
+        self.check_for_questions()
+        self.run_daemons()
       sim_time.append(time.time() - sim_start)
     return res
 
@@ -101,3 +117,10 @@ class Process:
           continue
         res[i][ind_var].append(data)
     return
+
+  def __eq__(self, other):
+      # custom equality logic so daemons can be hashed
+      return self.value == other.value
+
+  def __hash__(self):
+      return hash(self.value)
