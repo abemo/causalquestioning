@@ -72,16 +72,17 @@ class Process:
 
   def check_for_questions(self):
     # if there is a question to be asked, check if it's been asked and
+      # should we keep a list of asked questions?
     # if it hasn't add the question to self.daemons
     # this will be done via checking the environments
     pass
 
   def run_daemons(self):
-        for daemon in self.daemons:
-            daemon.simulate()
-            # if daemon.age > environment.daemon_death_age:
-                # self.possible_questions.remove(daemon)
-            # if calculate_entropy(daemon.pointed_to_node) > environment.entropy_threshhold
+    for daemon in self.daemons:
+        daemon.simulate()
+        # if daemon.age > environment.daemon_death_age:
+            # self.possible_questions.remove(daemon)
+        # if calculate_entropy(daemon.pointed_to_node) > environment.entropy_threshhold
 
   def simulate(self):
     res = [{}, {}]
