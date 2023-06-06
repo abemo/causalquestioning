@@ -16,7 +16,7 @@ class Agent:
     self.rng = rng
     self.name = str(index)
     self._environment = environment
-    self.cgm = environment.cgm
+    self.cgm = environment.cgm # TODO:MAKE PGM
     self.agents = agents
     self.domains = environment.domains
     self.act_var = environment.act_var
@@ -35,7 +35,7 @@ class Agent:
     self.rand_trials_rem = [rand_trials] * \
         len(self.contexts) if self.contexts else rand_trials
     self.cooling_rate = cooling_rate
-    self.my_cpts = {
+    self.my_cpts = {# TODO: make pgm
         var: CPT(var, self.cgm.get_parents(var), self.domains)
         for var in self.domains
     }
@@ -205,10 +205,10 @@ class Agent:
 
 
 class AskAgent(Agent):
-  def __init__(self, dag, *args, **kwargs):
+  def __init__(self, dbn, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.name = "Unique Identifier" #TODO: make this a unique identifier
-    self.dag = dag
+    self.dbn = dbn
 
   def ask():
     pass

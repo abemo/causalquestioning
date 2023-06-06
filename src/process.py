@@ -70,32 +70,18 @@ class Process:
         agents.append(self.agent_maker(i, next(envs), assignments.pop(), agents))
       yield World(agents, self.T)
 
-  def check_for_questions(self):
-    # if there is a question to be asked, check if it's been asked and
-      # should we keep a list of asked questions?
-    # if it hasn't add the question to self.daemons
-    # this will be done via checking the environments
-    pass
-
-  def run_daemons(self):
-    for daemon in self.daemons:
-        daemon.simulate()
-        # if daemon.age > environment.daemon_death_age:
-            # self.possible_questions.remove(daemon)
-        # if calculate_entropy(daemon.pointed_to_node) > environment.entropy_threshhold
-
   def simulate(self):
     res = [{}, {}]
     sim_time = []
     for i in range(self.mc_sims):
       sim_start = time.time()
-      for j, world in enumerate(self.world_generator()):
+      for j, world in enumerate(self.world_generator()):# we're not iterating over different worlds, trim this
         time_rem = None if not sim_time else \
             (sum(sim_time) / len(sim_time)) * \
             (self.mc_sims - (i + (j / len(self.ass_perms))))
         time_rem_str = '?' if time_rem is None else \
             '%dh %dm   ' % (time_rem // (60 * 60), time_rem // 60 % 60)
-        for k in range(self.T):
+        for k in range(self.T): # these are time steps
           world.run_episode(k)
           printProgressBar(
               iteration=i*len(self.ass_perms)+j+(k+1)/self.T,
@@ -104,7 +90,6 @@ class Process:
           )
         self.update_process_result(res, world)
         self.check_for_questions()
-        self.run_daemons()
       sim_time.append(time.time() - sim_start)
     return res
 
