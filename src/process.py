@@ -74,11 +74,11 @@ class Process:
           '%dh %dm   ' % (time_rem // (60 * 60), time_rem // 60 % 60)
       for k in range(self.T): # these are time steps
         world.run_episode(k)
-        printProgressBar(
-            iteration=i*len(self.ass_perms)+1+(k+1)/self.T,
-            total=self.mc_sims * len(self.ass_perms),
-            suffix=time_rem_str,
-        )
+        # printProgressBar(
+        #     iteration=i*len(self.ass_perms)+1+(k+1)/self.T,
+        #     total=self.mc_sims * len(self.ass_perms),
+        #     suffix=time_rem_str,
+        # )
         self.update_process_result(res, world)
       sim_time.append(time.time() - sim_start)
     return res

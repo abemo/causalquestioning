@@ -113,7 +113,6 @@ class Sim:
         results[index] = proc.simulate()
 
     def combine_results(self, process_results):
-        print(process_results)
         results = [{}, {}]
         for pr in process_results:
             for i in range(len(results)):
@@ -313,7 +312,7 @@ if __name__ == "__main__":
         # (baseline, reversed_w, baseline, reversed_w),
         otp=OTP.SOLO,
         asr=ASR.EG,
-        T=10,
+        T=100,
         mc_sims=8,
         tau=0.05,
         EG_epsilon=100/3000,
