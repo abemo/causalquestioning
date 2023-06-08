@@ -5,17 +5,13 @@ import pandas as pd
 import math
 import graphviz
 import os
+from itertools import combinations
 
 
-class PGM:
-    def __init__(self, nodes, given_cpts):
+class DBN:
+    def __init__(self):
         self.model = DAG.DBN()
         self.model.add_nodes_from(nodes)
-
-        self.cpts = {}
-        for cpt in given_cpts:
-            self.cpts[f'cpt_{cpt.variable}'] = cpt
-            self.model.add_cpds(cpt)
 
 
     def node_entropy(self, node) -> float:
@@ -30,16 +26,23 @@ class PGM:
         dot = graphviz.Digraph()
         for node in self.model.get_slice_nodes():
             dot.node(node, f"{node}\n{self.node_entropy(node)}")
-        for edge in self.model.get_edges(): #TODO: not right way to get edges
+        for edge in self.model.get_edges():
             dot.edge(edge[0], edge[1])
         dot.render(f'{os.path.dirname(__file__)}/../../output/causal-model.gv', view=True)
         
 
-    def get_edges(self) -> list: #TODO: just do the edge thing a:BCD B:CD C:D
-        nodes = self.model.get_slice_nodes()
-        for node in nodes:
+    def get_edges(self) -> list:
+        nodes = list(combinations(self.model.get_slice_nodes(), 2))
+        edges = []
+        for node_pair in nodes:
+            if self.model.has_edge(node_pair[0], node_pair[1]):
+                edges.append(node_pair)
+        return edges
+    
 
-            pass
+if __name__ == "__main__":
+    dbn = DBN()
+    dbn.draw()
 
         
 

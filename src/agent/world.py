@@ -4,44 +4,37 @@ simulation. All agents and their environments exist in a World, and this class i
 store results to be returned to the process and simulation at the end of execution.
 """
 
-from agent.agent import AdjustAgent
 from util import only_given_keys
 
 
 class World:
-  def __init__(self, agents, T):
-    self.agents = agents #this is the main model
-    self.cpr = {a: [0] * T for a in self.agents}
-    self.poa = {a: [0] * T for a in self.agents}
-    self.has_sensitive = any(
-        [isinstance(a, (AdjustAgent)) for a in self.agents])
-    self.daemons = []
+  def __init__(self, agent, T):
+    self.agent = agent #this is the main model
+    self.cpr = [0] * T
+    self.poa = [0] * T
+    self.daemons = set()
 
-  def run_episode(self, ep):# this is one trial 
-    for a in self.agents:
-      if self.has_sensitive:
-        a.update_divergence()
-      context = a._environment.pre.sample(a.rng)
-      action = a.choose(context)
-      sample = a._environment.post.sample(a.rng, {**context, **action})
-      a.observe(sample)
+  def run_episode(self, ep): # this is one trial 
+    context = self.agent._environment.pre.sample(self.agent.rng)
+    action = self.agent.choose(context)
+    sample = self.agent._environment.post.sample(self.agent.rng, {**context, **action})
+    self.agent.observe(sample)
     self.update(ep)
-    self.check_for_questions()
-    self.run_daemons()
+    # self.check_for_questions()
+    # self.run_daemons()
     return
 
   def update(self, ep):
-    for a in self.agents:
-      recent = a.get_recent()
-      rew_received = recent[a.rew_var]
-      feature_assignments = only_given_keys(recent, a._environment.feat_vars)
-      rew_optimal = a._environment.get_optimal_reward(feature_assignments)
-      curr_regret = self.cpr[a][ep-1]
-      new_regret = curr_regret + (rew_optimal - rew_received)
-      self.cpr[a][ep] = new_regret
-      optimal_actions = a._environment.get_optimal_actions(feature_assignments)
-      self.poa[a][ep] = 1 if only_given_keys(
-          recent, a.act_var) in optimal_actions else 0
+    recent = self.agent.get_recent()
+    rew_received = recent[self.agent.rew_var]
+    feature_assignments = only_given_keys(recent, self.agent._environment.feat_vars)
+    rew_optimal = self.agent._environment.get_optimal_reward(feature_assignments)
+    curr_regret = self.cpr[ep-1]
+    new_regret = curr_regret + (rew_optimal - rew_received)
+    self.cpr[ep] = new_regret
+    optimal_actions = self.agent._environment.get_optimal_actions(feature_assignments)
+    self.poa[ep] = 1 if only_given_keys(
+        recent, self.agent.act_var) in optimal_actions else 0
     return
 
   def check_for_questions(self):
@@ -60,3 +53,4 @@ class World:
 
   def __reduce__(self):
     return (self.__class__, (self.agents, self.T))
+

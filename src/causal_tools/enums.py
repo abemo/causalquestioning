@@ -7,7 +7,6 @@ from enum import Enum
 
 
 class OTP(Enum):
-  ADJUST = "Adjust"
   SOLO = "Solo"
 
   def __lt__(self, other):

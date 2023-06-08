@@ -1,5 +1,5 @@
 """
-Defines the Agent class and its inheritors (SoloAgent, AdjustAgent)
+Defines the Agent class and its inheritors (SoloAgent, AskAgent)
 """
 
 from copy import deepcopy
@@ -8,16 +8,15 @@ from query import Count, Product, Query
 from util import only_given_keys, permutations, hellinger_dist
 from causal_tools.enums import ASR
 from math import inf
-from causal_tools.dag import DAG
 
 
 class Agent:
-  def __init__(self, rng, index, environment, agents, tau=None, asr=ASR.EG, epsilon=0, rand_trials=0, cooling_rate=0):
+  def __init__(self, rng, name, environment, tau=None, asr=ASR.EG, epsilon=0, rand_trials=0, cooling_rate=0):
     self.rng = rng
-    self.name = str(index)
+    self.name = name
     self._environment = environment
-    self.cgm = environment.cgm # TODO:MAKE PGM
-    self.agents = agents
+    self.cgm = environment.cgm # TODO: replace with our DBN
+    # self.agents = agents
     self.domains = environment.domains
     self.act_var = environment.act_var
     self.act_dom = self.domains[self.act_var]
@@ -28,7 +27,7 @@ class Agent:
     self.contexts = permutations(self.get_context())
     self.tau = tau
     self.asr_combo = asr
-    self.asr = asr[index] if isinstance(asr, tuple) else asr
+    self.asr = asr
     self.epsilon = ([1] * len(self.contexts)
                     if self.contexts else 1) if asr == ASR.ED else epsilon
     self.rand_trials = rand_trials
@@ -204,6 +203,14 @@ class Agent:
         and self.name == other.name
 
 
+class SoloAgent(Agent):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+  def get_cpts(self):
+    return self.my_cpts
+  
+
 class AskAgent(Agent):
   def __init__(self, dbn, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -223,100 +230,4 @@ class AskAgent(Agent):
     return self.__hash_askagent__() == other.__hash_askagent__() and self.__hash_dag__() == other.__hash_dag__()
 
 
-class SoloAgent(Agent):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
 
-  def get_cpts(self):
-    return self.my_cpts
-
-
-class AdjustAgent(Agent):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    # May want to include all ancestors of X, not just parents
-    self.context_vars = set(self.get_context().keys())
-    self.divergence = dict()
-
-  def get_cpts(self):
-    cpts = deepcopy(self.my_cpts)
-    for a in self.agents:
-      if a == self:
-        continue
-      div_nodes = self.div_nodes(a)
-      for n in cpts:
-        if n not in div_nodes:
-          cpts[n].update(a.my_cpts[n])
-    return cpts
-
-
-  def get_non_act_nodes(self): 
-    return {node for node in self.domains if node != self.act_var}
-  
-
-  def update_divergence(self):
-    for a in self.agents:
-      if a == self:
-        continue
-      if a not in self.divergence:
-        self.divergence[a] = {n: inf for n in self.cgm.get_unset_nodes()}
-      for n in self.get_non_act_nodes():
-        self.divergence[a][n] = hellinger_dist(
-            self.domains, self.my_cpts[n], a.my_cpts[n], self.cgm.get_node_dist(n))
-  
-  def div_nodes(self, agent):
-    if self == agent:
-      return set()
-    return {node for node, dist in self.divergence[agent].items() if dist is None or dist > self.get_scaled_tau(node)}
-
-  def get_scaled_tau(self, node):
-    scale_factor = 1
-    for parent in self.cgm.get_parents(node):
-      scale_factor *= len(self.domains[parent])
-    return self.tau * scale_factor
-
-  def expected_rew(self, givens, cpts):
-    query = self.get_rew_query().assign(givens)
-    summ = 0
-    for rew_val in self.rew_dom:
-      query.assign(self.rew_var, rew_val)
-      rew_prob = query.solve(cpts)
-      summ += rew_val * rew_prob if rew_prob is not None else 0
-    return summ
-
-  def get_rew_query(self):
-    dist_vars = self.cgm.causal_path(self.act_var, self.rew_var)
-    return Product(
-        self.cgm.get_node_dist(v)
-        for v in dist_vars
-    ).assign(self.domains)
-
-  def all_causal_path_nodes_corrupted(self, agent):
-    return self.cgm.causal_path(self.act_var, self.rew_var).issubset(set(self.div_nodes(agent)))
-
-  def thompson_sample(self, context):
-    best_acts = []
-    best_sample = 0
-    cpts = self.get_cpts()
-    rew_query = self.get_rew_query().assign(context)
-    for act in self.actions:
-      a = 0
-      b = 0
-      for agent in self.agents:
-        if self.all_causal_path_nodes_corrupted(agent):
-          continue
-        rew_query = rew_query.assign(act)
-        a_prob = rew_query.assign(self.rew_var, 1).solve(cpts)
-        b_prob = rew_query.assign(self.rew_var, 0).solve(cpts)
-        if a_prob is None or b_prob is None:
-          continue
-        count = agent.my_cpts[self.act_var][Count({**act, **context})]
-        a += a_prob * count
-        b += b_prob * count
-      sample = self.rng.beta(a+1, b+1)
-      if sample > best_sample:
-        best_sample = sample
-        best_acts = [act]
-      if sample == best_sample:
-        best_acts.append(act)
-    return self.rng.choice(best_acts)

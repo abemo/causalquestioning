@@ -39,7 +39,7 @@ class Environment:
           for parent in model.parents
       ])
 
-    self.cgm = CausalGraph(nodes=nodes, edges=edges, set_nodes=set_nodes)
+    self.cgm = CausalGraph(nodes=nodes, edges=edges, set_nodes=set_nodes) #TODO: MAYBE THIS MUST BE PGM
 
     pre_nodes = list(self.cgm.get_ancestors(self.act_var))
     self.pre = StructuralCausalModel(only_given_keys(self._assignment, pre_nodes))

@@ -19,15 +19,14 @@ from itertools import combinations_with_replacement
 
 
 class Sim:
-    def __init__(self, environment_dicts, otp, tau, asr, T, mc_sims, EG_epsilon=0, EF_rand_trials=0, ED_cooling_rate=0, is_community=False, rand_envs=False, node_mutation_chance=0, show=True, save=False, seed=None):
+    def __init__(self, environment_dict, otp, tau, asr, T, mc_sims, EG_epsilon=0, EF_rand_trials=0, ED_cooling_rate=0, is_community=False, rand_envs=False, node_mutation_chance=0, show=True, save=False, seed=None):
         asr = tuple(tuple(e) for e in asr) if isinstance(
             asr, combinations_with_replacement) else asr
         self.start_time = time.time()
         self.rand_envs = rand_envs
         self.nmc = node_mutation_chance
-        self.environments = [Environment(env_dict)
-                             for env_dict in environment_dicts]
-        self.num_agents = len(self.environments)
+        self.environment = Environment(environment_dict)
+        self.num_agents = 1
         self.assignments = self.get_assignments(
             otp, tau, asr, EG_epsilon, EF_rand_trials, ED_cooling_rate)
         self.ind_var = self.get_ind_var()
@@ -45,9 +44,9 @@ class Sim:
         self.last_episode_cpr = DataFrame()
         self.last_episode_poa = DataFrame()
         self.values = self.get_values(locals())
-        self.domains = self.environments[0].get_domains()
-        self.act_var = self.environments[0].get_act_var()
-        self.rew_var = self.environments[0].get_rew_var()
+        self.domains = self.environment.get_domains()
+        self.act_var = self.environment.get_act_var()
+        self.rew_var = self.environment.get_rew_var()
 
     def get_assignments(self, otp, tau, asr, EG_epsilon, EF_rand_trials, ED_cooling_rate):
         assignments = {
@@ -95,7 +94,7 @@ class Sim:
     def process_args(self, index):
         return {
             'rng': default_rng(self.seed + index),
-            'environments': self.environments,
+            'environment': self.environment,
             'rew_var': self.rew_var,
             'is_community': self.is_community,
             'nmc': self.nmc,
@@ -114,6 +113,7 @@ class Sim:
         results[index] = proc.simulate()
 
     def combine_results(self, process_results):
+        print(process_results)
         results = [{}, {}]
         for pr in process_results:
             for i in range(len(results)):
@@ -256,8 +256,7 @@ class Sim:
                     df.to_excel(writer, sheet_name=sheet_name)
             with open(dir_path + '/values.json', 'w') as outfile:
                 dump(self.values, outfile)
-            for environment in self.environments:
-                environment.cgm.draw_model()
+            self.environment.cgm.draw_model()
 
     def run(self, desc=None):
         if desc:
@@ -277,12 +276,12 @@ class Sim:
             e.value for e in values["asr"]] if isinstance(values["asr"][0], Enum) else [
             [e.value for e in a] for a in values['asr']]
         parsed_env_dicts = []
-        for env in values["environment_dicts"]:
-            parsed_env = {}
-            for node, model in env.items():
-                parsed_env[node] = str(model)
-            parsed_env_dicts.append(parsed_env)
-        values["environment_dicts"] = tuple(parsed_env_dicts)
+        env = values["environment_dict"]
+        parsed_env = {}
+        for node, model in env.items():
+            parsed_env[node] = str(model)
+        parsed_env_dicts.append(parsed_env)
+        values["environment_dict"] = tuple(parsed_env_dicts)
         values["seed"] = self.seed
         return values
 
@@ -310,10 +309,10 @@ if __name__ == "__main__":
     # reversed_w["S"] = DiscreteModel("X", {(0,): (0.25, 0.75), (1,): (0.75, 0.25)})
 
     experiment = Sim(
-        environment_dicts=(baseline, reversed_w, baseline, reversed_w),
-        otp=OTP.SOLO,  # (OTP.SOLO, OTP.ADJUST),
-        # (ASR.EG, ASR.EF, ASR.ED, ASR.TS),
-        asr=combinations_with_replacement((ASR.TS, ASR.EF), 4),
+        environment_dict=baseline,
+        # (baseline, reversed_w, baseline, reversed_w),
+        otp=OTP.SOLO,
+        asr=ASR.EG,
         T=10,
         mc_sims=8,
         tau=0.05,

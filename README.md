@@ -69,7 +69,7 @@
 Defines agent classes and their behaviors.
 - `Agent` - a superclass for the following classes
 - `SoloAgent`
-- `AdjustAgent` 
+- `AskAgent`
 ### `assignment_models.py`
 Defines assignment models, which describe the behavior of certain nodes in an SCM. These include:
 - `ActionModel` - probability distribution is determined by an agent, and is not pre-defined
