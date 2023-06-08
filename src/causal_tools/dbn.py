@@ -12,6 +12,8 @@ class DBN:
     def __init__(self):
         self.model = DAG.DBN()
         self.model.add_nodes_from(nodes)
+        #TODO: need to learn the nodes and cpts from the data
+        #TODO: make the code use DBN instead of CGM or CPT
 
 
     def node_entropy(self, node) -> float:
