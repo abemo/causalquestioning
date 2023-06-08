@@ -9,9 +9,10 @@ from itertools import combinations
 
 
 class DBN:
-    def __init__(self):
+    def __init__(self, world):
         self.model = DAG.DBN()
-        self.model.add_nodes_from(nodes)
+        self.model.add_nodes_from(world.agent.cgm.dag.nodes)
+        #TODO: do we need to copy over all the methods and functions from cgm.py?
         #TODO: need to learn the nodes and cpts from the data
         #TODO: make the code use DBN instead of CGM or CPT
 
@@ -22,6 +23,10 @@ class DBN:
         for prob in cpd.get_values()[-1]:
             shannon_entropy += prob * math.log((1 / prob), 2)
         return shannon_entropy
+    
+
+    def get_highest_entropy_pair(self) -> tuple:
+        return max(list(combinations(self.model.get_slice_nodes(), 2)), key=lambda pair: self.node_entropy(pair[0]) + self.node_entropy(pair[1]))
 
 
     def draw(self):
