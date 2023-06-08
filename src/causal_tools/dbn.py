@@ -40,9 +40,6 @@ class DBN:
         return edges
     
 
-if __name__ == "__main__":
-    dbn = DBN()
-    dbn.draw()
 
         
 
