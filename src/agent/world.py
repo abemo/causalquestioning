@@ -14,14 +14,15 @@ class World:
     self.poa = [0] * T
     self.daemons = set()
 
-  def run_episode(self, ep): # this is one trial 
+  def run_episode(self, ep): # this is one trial
     context = self.agent._environment.pre.sample(self.agent.rng)
     action = self.agent.choose(context)
     sample = self.agent._environment.post.sample(self.agent.rng, {**context, **action})
     self.agent.observe(sample)
     self.update(ep)
     # self.check_for_questions()
-    # self.run_daemons()
+    # new_info = self.run_daemons()
+    #apply new info
     return
 
   def update(self, ep):

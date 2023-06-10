@@ -3,7 +3,6 @@ Defines the Agent class and its inheritors (SoloAgent, AskAgent)
 """
 
 from copy import deepcopy
-from causal_tools.cpt import CPT
 from query import Count, Product, Query
 from util import only_given_keys, permutations, hellinger_dist
 from causal_tools.enums import ASR
@@ -209,7 +208,7 @@ class SoloAgent(Agent):
 
   def get_cpts(self):
     return self.my_cpts
-  
+
 
 class AskAgent(Agent):
   def __init__(self, dbn, *args, **kwargs):
@@ -222,10 +221,10 @@ class AskAgent(Agent):
 
   def __hash_askagent__(self):
     return hash(self.name)
-  
+
   def __hash_dag__(self):
     return hash(self.dag)
-  
+
   def __eq__(self, other):
     return self.__hash_askagent__() == other.__hash_askagent__() and self.__hash_dag__() == other.__hash_dag__()
 
