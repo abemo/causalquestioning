@@ -3,3 +3,4 @@
 .vs/
 src/sim.py
 output/*
+.DS_Store

@@ -36,7 +36,7 @@ class Environment:
                 assert self.act_var == None
                 self.act_var = node
             edges.extend([
-                (parent, node)
+                ((parent, 0), (node, 0))
                 for parent in model.parents
             ])
 
@@ -45,7 +45,7 @@ class Environment:
         self.dbn = DBN(nodes=nodes, edges=edges,
                        data=data, set_nodes=set_nodes)
 
-        pre_nodes = list(self.dbn.get_ancestors(self.act_var))
+        pre_nodes = list(self.dbn.get_ancestors(self.act_var))  # FORNEY
         self.pre = StructuralCausalModel(
             only_given_keys(self._assignment, pre_nodes))
         post_ass = self._assignment.copy()

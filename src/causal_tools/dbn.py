@@ -13,14 +13,14 @@ from re import findall
 
 
 class DBN:
-    def __init__(self, nodes, edges, data, latent_edges=None, set_nodes=None):
+    def __init__(self, nodes, edges, data, latent_edges=[], set_nodes=[]):
         self.model = DynamicBayesianNetwork()
         self.model.add_nodes_from(nodes)
         self.model.add_nodes_from(set_nodes)
         self.model.add_edges_from(edges)
         self.model.add_edges_from(latent_edges)
-        estimator = MaximumLikelihoodEstimator(self.model, data)
-        self.model.fit(data, estimator=estimator)
+        # estimator = MaximumLikelihoodEstimator(self.model, data)
+        # self.model.fit(data)  # cannot fit until data exists
 
     def node_entropy(self, node) -> float:
         cpd = self.model.get_cpds(node)
@@ -83,58 +83,63 @@ class DBN:
         """
         return self.model.do(node)
 
+
 def calculate_edit_distance(self, other_graph) -> int:
-        """
-        Calculates the edit distance between two graphs.
-        currently from chat gpt, untested TODO see if it works
-        """
+    """
+    Calculates the edit distance between two graphs.
+    currently from chat gpt, untested TODO see if it works
+    """
 
-        # Convert the pgmpy graphs to NetworkX graphs
-        graph1 = self.model.to_networkx()
-        graph2 = other_graph.to_networkx()
+    # Convert the pgmpy graphs to NetworkX graphs
+    graph1 = self.model.to_networkx()
+    graph2 = other_graph.to_networkx()
 
-        # Define edit operations and their costs
-        operation_costs = {
-            'add_node': 1,
-            'remove_node': 1,
-            'add_edge': 1,
-            'remove_edge': 1,
-            'reverse_edge': 2
-        }
+    # Define edit operations and their costs
+    operation_costs = {
+        'add_node': 1,
+        'remove_node': 1,
+        'add_edge': 1,
+        'remove_edge': 1,
+        'reverse_edge': 2
+    }
 
-        # Compute structural differences between the graphs
-        node_diff = set(graph1.nodes()) ^ set(graph2.nodes())
-        edge_diff = set(graph1.edges()) ^ set(graph2.edges())
+    # Compute structural differences between the graphs
+    node_diff = set(graph1.nodes()) ^ set(graph2.nodes())
+    edge_diff = set(graph1.edges()) ^ set(graph2.edges())
 
-        # Initialize the dynamic programming table
-        dp_table = [[0] * (len(graph2.nodes()) + 1) for _ in range(len(graph1.nodes()) + 1)]
+    # Initialize the dynamic programming table
+    dp_table = [[0] * (len(graph2.nodes()) + 1)
+                for _ in range(len(graph1.nodes()) + 1)]
 
-        # Fill in the dynamic programming table
-        for i in range(len(graph1.nodes()) + 1):
-            dp_table[i][0] = i * operation_costs['remove_node']
+    # Fill in the dynamic programming table
+    for i in range(len(graph1.nodes()) + 1):
+        dp_table[i][0] = i * operation_costs['remove_node']
 
-        for j in range(len(graph2.nodes()) + 1):
-            dp_table[0][j] = j * operation_costs['add_node']
+    for j in range(len(graph2.nodes()) + 1):
+        dp_table[0][j] = j * operation_costs['add_node']
 
-        for i in range(1, len(graph1.nodes()) + 1):
-            for j in range(1, len(graph2.nodes()) + 1):
-                if list(graph1.nodes())[i - 1] == list(graph2.nodes())[j - 1]:
-                    node_cost = 0
-                else:
-                    node_cost = operation_costs['remove_node'] + operation_costs['add_node']
-
-                dp_table[i][j] = min(
-                    dp_table[i - 1][j] + operation_costs['remove_node'],
-                    dp_table[i][j - 1] + operation_costs['add_node'],
-                    dp_table[i - 1][j - 1] + node_cost
-                )
-
-        # Add costs for edge modifications
-        for edge in edge_diff:
-            if edge in graph1.edges() and edge in graph2.edges():
-                dp_table[len(graph1.nodes())][len(graph2.nodes())] += operation_costs['reverse_edge']
+    for i in range(1, len(graph1.nodes()) + 1):
+        for j in range(1, len(graph2.nodes()) + 1):
+            if list(graph1.nodes())[i - 1] == list(graph2.nodes())[j - 1]:
+                node_cost = 0
             else:
-                dp_table[len(graph1.nodes())][len(graph2.nodes())] += operation_costs['remove_edge']
+                node_cost = operation_costs['remove_node'] + \
+                    operation_costs['add_node']
 
-        # Return the edit distance
-        return int(dp_table[len(graph1.nodes())][len(graph2.nodes())])
+            dp_table[i][j] = min(
+                dp_table[i - 1][j] + operation_costs['remove_node'],
+                dp_table[i][j - 1] + operation_costs['add_node'],
+                dp_table[i - 1][j - 1] + node_cost
+            )
+
+    # Add costs for edge modifications
+    for edge in edge_diff:
+        if edge in graph1.edges() and edge in graph2.edges():
+            dp_table[len(graph1.nodes())][len(graph2.nodes())
+                                          ] += operation_costs['reverse_edge']
+        else:
+            dp_table[len(graph1.nodes())][len(graph2.nodes())
+                                          ] += operation_costs['remove_edge']
+
+    # Return the edit distance
+    return int(dp_table[len(graph1.nodes())][len(graph2.nodes())])

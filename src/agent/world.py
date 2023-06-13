@@ -18,7 +18,7 @@ class World:
     context = self.agent._environment.pre.sample(self.agent.rng)
     action = self.agent.choose(context)
     sample = self.agent._environment.post.sample(self.agent.rng, {**context, **action})
-    self.agent.observe(sample)
+    self.agent.observe(sample) # this may be where fit is called? not sure...
     self.update(ep)
     # self.check_for_questions()
     # new_info = self.run_daemons()
