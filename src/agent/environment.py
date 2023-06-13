@@ -34,7 +34,7 @@ class Environment:
             self.domains[node] = model.domain
             if isinstance(model, ActionModel):
                 assert self.act_var == None
-                self.act_var = node
+                self.act_var = (node, 0)
             edges.extend([
                 ((parent, 0), (node, 0))
                 for parent in model.parents

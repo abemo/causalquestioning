@@ -56,7 +56,22 @@ class DBN:
         return set.union(*[self.model.get_parents(node) for node in nodes])
 
     def get_ancestors(self, nodes) -> set:
-        return set.union(*[self.model.get_ancestral_graph(node).get_slice_nodes() for node in nodes])
+        if not isinstance(nodes, (list)):
+            nodes = [nodes]
+
+        for node in nodes:
+            print([node.to_tuple() for node in self.model.nodes])
+            if node not in [node.to_tuple() for node in self.model.nodes]:
+                raise ValueError(f"Node {node} not in graph")
+
+        ancestors_list = set()
+        nodes_list = set(nodes)
+        while nodes_list:
+            node = nodes_list.pop()
+            if node not in ancestors_list:
+                nodes_list.update(self.predecessors(node))
+            ancestors_list.add(node)
+        return ancestors_list
 
     def get_feat_vars(self, act_var) -> set:
         return self.model.get_parents(act_var)
