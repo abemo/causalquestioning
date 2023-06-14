@@ -13,14 +13,15 @@ from re import findall
 
 
 class DBN:
-    def __init__(self, nodes, edges, data, latent_edges=[], set_nodes=[]):
+    def __init__(self, nodes, edges, data=None, latent_edges=[], set_nodes=[]):
         self.model = DynamicBayesianNetwork()
         self.model.add_nodes_from(nodes)
         self.model.add_nodes_from(set_nodes)
         self.model.add_edges_from(edges)
         self.model.add_edges_from(latent_edges)
-        # estimator = MaximumLikelihoodEstimator(self.model, data)
-        # self.model.fit(data)  # cannot fit until data exists
+        # if data:
+            # estimator = MaximumLikelihoodEstimator(self.model, data)
+            # self.model.fit(data)  # cannot fit until data exists
 
     def node_entropy(self, node) -> float:
         cpd = self.model.get_cpds(node)
@@ -53,14 +54,26 @@ class DBN:
         """
         Returns the parents of a node or set of nodes.
         """
-        return set.union(*[self.model.get_parents(node) for node in nodes])
+        if not isinstance(nodes, (list)):
+            nodes = [nodes]
+        
+        for node in nodes:
+            if node not in [node.to_tuple() for node in self.model.nodes]:
+                raise ValueError(f"Node {node} not in graph")
+        
+        parents = set()
+        for node_pair in self.get_edges():
+            if node_pair[1] in nodes:
+                parents.add(node_pair[0])
+                
+        return parents
 
     def get_ancestors(self, nodes) -> set:
         if not isinstance(nodes, (list)):
             nodes = [nodes]
 
         for node in nodes:
-            print([node.to_tuple() for node in self.model.nodes])
+            # print([node.to_tuple() for node in self.model.nodes])
             if node not in [node.to_tuple() for node in self.model.nodes]:
                 raise ValueError(f"Node {node} not in graph")
 
@@ -69,7 +82,7 @@ class DBN:
         while nodes_list:
             node = nodes_list.pop()
             if node not in ancestors_list:
-                nodes_list.update(self.predecessors(node))
+                nodes_list.update(self.model.predecessors(node))
             ancestors_list.add(node)
         return ancestors_list
 

@@ -11,6 +11,7 @@ The code has been imported and modified into this project for ease/consistency
 
 import networkx as nx
 from causal_tools.assignment_models import ActionModel
+from causal_tools.dbn import DBN
 import math
 
 
@@ -33,7 +34,7 @@ class StructuralCausalModel:
                     (parent, node)
                     for parent in model.parents
                 ])
-        self.cgm = CausalGraph(
+        self.cgm = DBN(
             nodes=nodes, edges=edges, set_nodes=set_nodes
         )
 
