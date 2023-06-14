@@ -51,7 +51,9 @@ class Environment:
         post_ass = self._assignment.copy()
         print("===========================")
         print(pre_nodes)
-        [post_ass.update({n: ActionModel(self.dbn.get_parents(n), self.domains[n])})
+        print("Domains: " + str(self.domains))
+        print("===========================")
+        [post_ass.update({n: ActionModel(self.dbn.get_parents(n), self.domains[n])}) # TODO how to get from domain? must be of type (node, time_slice)
          for n in pre_nodes]
         self.post = StructuralCausalModel(post_ass)
 
