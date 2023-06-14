@@ -45,10 +45,12 @@ class Environment:
         self.dbn = DBN(nodes=nodes, edges=edges,
                        data=data, set_nodes=set_nodes)
 
-        pre_nodes = list(self.dbn.get_ancestors(self.act_var))  # FORNEY
+        pre_nodes = list(self.dbn.get_ancestors(self.act_var))
         self.pre = StructuralCausalModel(
             only_given_keys(self._assignment, pre_nodes))
         post_ass = self._assignment.copy()
+        print("===========================")
+        print(pre_nodes)
         [post_ass.update({n: ActionModel(self.dbn.get_parents(n), self.domains[n])})
          for n in pre_nodes]
         self.post = StructuralCausalModel(post_ass)

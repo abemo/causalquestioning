@@ -65,8 +65,8 @@ class DBN:
         for node_pair in self.get_edges():
             if node_pair[1] in nodes:
                 parents.add(node_pair[0])
-                
-        return parents
+
+        return parents if parents else None
 
     def get_ancestors(self, nodes) -> set:
         if not isinstance(nodes, (list)):
@@ -84,7 +84,13 @@ class DBN:
             if node not in ancestors_list:
                 nodes_list.update(self.model.predecessors(node))
             ancestors_list.add(node)
-        return ancestors_list
+
+        ancestors_array = list(ancestors_list)
+        for i, node in enumerate(ancestors_array):
+            if type(node) is not tuple:
+                ancestors_array[i] = node.to_tuple()
+
+        return set(ancestors_array)
 
     def get_feat_vars(self, act_var) -> set:
         return self.model.get_parents(act_var)
