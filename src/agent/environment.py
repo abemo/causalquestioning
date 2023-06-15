@@ -29,6 +29,7 @@ class Environment:
         self.rew_var = rew_var
         set_nodes = []
         edges = []
+        print(f"Assignment: {assignment}")
 
         for node, model in assignment.items():
             self.domains[node] = model.domain
@@ -40,7 +41,7 @@ class Environment:
                 for parent in model.parents
             ])
 
-        # TODO: MAYBE THIS MUST BE PGM
+        # TODO: data is empty right now?
         data = pd.DataFrame()
         self.bn = BN(nodes=nodes, edges=edges,
                        data=data, set_nodes=set_nodes)

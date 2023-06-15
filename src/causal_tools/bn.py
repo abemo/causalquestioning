@@ -1,6 +1,7 @@
 from pgmpy.base import DAG
 from pgmpy.models import BayesianNetwork
 from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.factors.discrete.CPD import TabularCPD
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -21,10 +22,12 @@ class BN:
         self.model.add_edges_from(latent_edges)
         if data is not None and not data.empty:
             estimator = MaximumLikelihoodEstimator(self.model, data)
-            self.model.fit(data, estimator)  # cannot fit until data exists
+            self.model.fit(data, estimator)
         else:
-            self.model.add_cpds()
+            for node in self.model.nodes():
+                self.model.add_cpds(TabularCPD(node, 2, [[1], [0]]))
         self.draw()
+    
 
     def node_entropy(self, node) -> float:
         cpd = self.model.get_cpds(node)

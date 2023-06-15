@@ -34,7 +34,7 @@ class Agent:
         len(self.contexts) if self.contexts else rand_trials
     self.cooling_rate = cooling_rate
     
-    self.my_cpts = environment.bn.get_cpds() # generate cpts here
+    self.my_cpts = environment.bn.get_cpts() # generate cpts here TODO generate them in BN?
     # nodes in the cgm that Y is dependent on that is either X or observed by X
     # in the OG example, this is Z, X
     # but if Z is not a counfounder on Y, but only connected to Y through X,
