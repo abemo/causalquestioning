@@ -1,5 +1,5 @@
 from pgmpy.base import DAG
-from pgmpy.models import DynamicBayesianNetwork
+from pgmpy.models import BayesianNetwork
 from pgmpy.estimators import MaximumLikelihoodEstimator
 import networkx as nx
 import numpy as np
@@ -12,38 +12,45 @@ from copy import deepcopy
 from re import findall
 
 
-class DBN:
+class BN:
     def __init__(self, nodes, edges, data=None, latent_edges=[], set_nodes=[]):
-        self.model = DynamicBayesianNetwork()
+        self.model = BayesianNetwork()
         self.model.add_nodes_from(nodes)
         self.model.add_nodes_from(set_nodes)
         self.model.add_edges_from(edges)
         self.model.add_edges_from(latent_edges)
-        # if data:
-            # estimator = MaximumLikelihoodEstimator(self.model, data)
-            # self.model.fit(data)  # cannot fit until data exists
+        if data is not None and not data.empty:
+            estimator = MaximumLikelihoodEstimator(self.model, data)
+            self.model.fit(data, estimator)  # cannot fit until data exists
+        else:
+            self.model.add_cpds()
+        self.draw()
 
     def node_entropy(self, node) -> float:
         cpd = self.model.get_cpds(node)
+
+        if cpd is None:
+            return f"No CPD found for node {node}"
+        
         shannon_entropy = 0
         for prob in cpd.get_values()[-1]:
             shannon_entropy += prob * math.log((1 / prob), 2)
         return shannon_entropy
 
     def get_highest_entropy_pair(self) -> tuple:
-        return max(list(combinations(self.model.get_slice_nodes(), 2)), key=lambda pair: self.node_entropy(pair[0]) + self.node_entropy(pair[1]))
+        return max(list(combinations(self.model.nodes(), 2)), key=lambda pair: self.node_entropy(pair[0]) + self.node_entropy(pair[1]))
 
     def draw(self):
         dot = graphviz.Digraph()
-        for node in self.model.get_slice_nodes():
+        for node in self.model.nodes():
             dot.node(node, f"{node}\n{self.node_entropy(node)}")
-        for edge in self.model.get_edges():
+        for edge in self.model.edges():
             dot.edge(edge[0], edge[1])
         dot.render(
             f'{os.path.dirname(__file__)}/../../output/causal-model.gv', view=True)
 
     def get_edges(self) -> list:
-        nodes = list(combinations(self.model.get_slice_nodes(), 2))
+        nodes = list(combinations(self.model.nodes(), 2))
         edges = []
         for node_pair in nodes:
             if self.model.has_edge(node_pair[0], node_pair[1]):
@@ -57,24 +64,26 @@ class DBN:
         if not isinstance(nodes, (list)):
             nodes = [nodes]
         
+        all_nodes = [node for node in self.model.nodes]
         for node in nodes:
-            if node not in [node.to_tuple() for node in self.model.nodes]:
+            if node not in all_nodes:
                 raise ValueError(f"Node {node} not in graph")
         
         parents = set()
-        for node_pair in self.get_edges():
+        for node_pair in self.model.edges:
             if node_pair[1] in nodes:
                 parents.add(node_pair[0])
 
-        return parents if parents else None
+        return parents
 
     def get_ancestors(self, nodes) -> set:
         if not isinstance(nodes, (list)):
             nodes = [nodes]
 
+        all_nodes = [node for node in self.model.nodes]
         for node in nodes:
             # print([node.to_tuple() for node in self.model.nodes])
-            if node not in [node.to_tuple() for node in self.model.nodes]:
+            if node not in all_nodes:
                 raise ValueError(f"Node {node} not in graph")
 
         ancestors_list = set()
@@ -85,12 +94,7 @@ class DBN:
                 nodes_list.update(self.model.predecessors(node))
             ancestors_list.add(node)
 
-        ancestors_array = list(ancestors_list)
-        for i, node in enumerate(ancestors_array):
-            if type(node) is not tuple:
-                ancestors_array[i] = node.to_tuple()
-
-        return set(ancestors_array)
+        return ancestors_list
 
     def get_feat_vars(self, act_var) -> set:
         return self.model.get_parents(act_var)
@@ -113,7 +117,7 @@ class DBN:
 
     def do(self, node) -> object:
         """
-        Apply intervention on node to CGM
+        Apply intervention on node to BN
         """
         return self.model.do(node)
 

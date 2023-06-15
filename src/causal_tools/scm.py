@@ -11,7 +11,7 @@ The code has been imported and modified into this project for ease/consistency
 
 import networkx as nx
 from causal_tools.assignment_models import ActionModel
-from causal_tools.dbn import DBN
+from causal_tools.bn import BN
 import math
 
 
@@ -34,12 +34,12 @@ class StructuralCausalModel:
                     (parent, node)
                     for parent in model.parents
                 ])
-        self.cgm = DBN(
+        self.bn = BN( # this was CGM
             nodes=nodes, edges=edges, set_nodes=set_nodes
         )
 
     def __repr__(self):
-        variables = ", ".join(map(str, sorted(self.cgm.dag.nodes())))
+        variables = ", ".join(map(str, sorted(self.bn.dag.nodes()))) # this was cgm
         return ("{classname}({vars})"
                 .format(classname=self.__class__.__name__, vars=variables))
 
@@ -60,7 +60,7 @@ class StructuralCausalModel:
         samples: pd.DataFrame
         """
         samples = {}
-        for node in nx.topological_sort(self.cgm.dag):
+        for node in nx.topological_sort(self.bn.dag): # this was cgm
             c_model = self.assignment[node]
 
             if isinstance(c_model, ActionModel):

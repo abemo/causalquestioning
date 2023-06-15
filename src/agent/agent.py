@@ -7,6 +7,7 @@ from query import Count, Product, Query
 from util import only_given_keys, permutations, hellinger_dist
 from causal_tools.enums import ASR
 from math import inf
+import pgmpy 
 
 
 class Agent:
@@ -14,8 +15,7 @@ class Agent:
     self.rng = rng
     self.name = name
     self._environment = environment
-    self.cgm = environment.cgm # TODO: replace with our DBN
-    # self.agents = agents
+    self.bn = environment.bn # this was cgm
     self.domains = environment.domains
     self.act_var = environment.act_var
     self.act_dom = self.domains[self.act_var]
@@ -33,17 +33,15 @@ class Agent:
     self.rand_trials_rem = [rand_trials] * \
         len(self.contexts) if self.contexts else rand_trials
     self.cooling_rate = cooling_rate
-    self.my_cpts = {# TODO: make pgm
-        var: CPT(var, self.cgm.get_parents(var), self.domains)
-        for var in self.domains
-    }
+    
+    self.my_cpts = environment.bn.get_cpds() # generate cpts here
     # nodes in the cgm that Y is dependent on that is either X or observed by X
     # in the OG example, this is Z, X
     # but if Z is not a counfounder on Y, but only connected to Y through X,
     # Z would not be included
     parents = {self.act_var}
-    for var in self.cgm.get_ancestors(self.act_var):
-      if not self.cgm.is_d_separated(var, self.rew_var, self.act_var):
+    for var in self.bn.get_ancestors(self.act_var): # this was cgm
+      if not self.bn.is_d_separated(var, self.rew_var, self.act_var): # this was cgm
         parents.add(var)
     self.my_cpts["rew"] = CPT(self.rew_var, parents, self.domains)
 
@@ -51,7 +49,7 @@ class Agent:
     return
 
   def get_context(self):
-    return only_given_keys(self.domains, self.cgm.get_parents(self.act_var))
+    return only_given_keys(self.domains, self.bn.get_parents(self.act_var)) # this was cgm
 
   def get_ind_var_value(self, ind_var):
     """
@@ -133,8 +131,8 @@ class Agent:
 
   def get_rew_query_unfactored(self):
     parents = {self.act_var}
-    for var in self.cgm.get_ancestors(self.act_var):
-      if not self.cgm.is_d_separated(var, self.rew_var, self.act_var):
+    for var in self.bn.get_ancestors(self.act_var): # this was cgm
+      if not self.bn.is_d_separated(var, self.rew_var, self.act_var): # this was cgm
         parents.add(var)
     return Query(self.rew_var, parents)
 
@@ -211,10 +209,10 @@ class SoloAgent(Agent):
 
 
 class AskAgent(Agent):
-  def __init__(self, dbn, *args, **kwargs):
+  def __init__(self, bn, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.name = "Unique Identifier" #TODO: make this a unique identifier
-    self.dbn = dbn
+    self.bn = bn
 
   def ask():
     pass

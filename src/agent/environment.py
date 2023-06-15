@@ -13,7 +13,7 @@ from util import hash_from_dict, only_given_keys, permutations
 from math import inf
 from causal_tools.scm import StructuralCausalModel
 from causal_tools.assignment_models import ActionModel
-from causal_tools.dbn import DBN
+from causal_tools.bn import BN
 
 
 class Environment:
@@ -34,18 +34,18 @@ class Environment:
             self.domains[node] = model.domain
             if isinstance(model, ActionModel):
                 assert self.act_var == None
-                self.act_var = (node, 0)
+                self.act_var = node
             edges.extend([
-                ((parent, 0), (node, 0))
+                (parent, node)
                 for parent in model.parents
             ])
 
         # TODO: MAYBE THIS MUST BE PGM
         data = pd.DataFrame()
-        self.dbn = DBN(nodes=nodes, edges=edges,
+        self.bn = BN(nodes=nodes, edges=edges,
                        data=data, set_nodes=set_nodes)
 
-        pre_nodes = list(self.dbn.get_ancestors(self.act_var))
+        pre_nodes = list(self.bn.get_ancestors(self.act_var))
         self.pre = StructuralCausalModel(
             only_given_keys(self._assignment, pre_nodes))
         post_ass = self._assignment.copy()
@@ -53,12 +53,13 @@ class Environment:
         print(pre_nodes)
         print("Domains: " + str(self.domains))
         print("===========================")
-        [post_ass.update({n: ActionModel(self.dbn.get_parents(n), self.domains[n])}) # TODO how to get from domain? must be of type (node, time_slice)
+        [post_ass.update({n: ActionModel(self.bn.get_parents(n), self.domains[n])})
          for n in pre_nodes]
         self.post = StructuralCausalModel(post_ass)
 
         self.feat_vars = self.get_feat_vars()
         self.assigned_optimal_actions()
+        
 
     def get_domains(self):
         return self.domains
@@ -79,7 +80,7 @@ class Environment:
         return {self.act_var: self.domains[self.act_var]}
 
     def get_feat_vars(self):
-        return set(self.dbn.get_parents(self.act_var))
+        return set(self.bn.get_parents(self.act_var))
 
     def get_feat_doms(self):
         return only_given_keys(self.domains, self.get_feat_vars())
@@ -142,7 +143,7 @@ class Environment:
 
     def expected_reward(self, givens={}):
         assigned_dist = self.assign_dist_with_givens(
-            self.dbn.get_dist_as_dict(self.rew_var), givens)
+            self.bn.get_dist_as_dict(self.rew_var), givens)
         reward_value_probs = self._assignment[self.rew_var].prob(
             self.parse_dist_as_probs(assigned_dist[self.rew_var]))
         return self.expected_value(reward_value_probs)
@@ -167,7 +168,7 @@ class Environment:
         return (self.__class__, (self._assignment, self.rew_var))
 
     def __repr__(self):
-        variables = ", ".join(map(str, sorted(self.dbn.dag.nodes())))
+        variables = ", ".join(map(str, sorted(self.bn.dag.nodes())))
         return ("{classname}({vars})"
                 .format(classname=self.__class__.__name__,
                         vars=variables))

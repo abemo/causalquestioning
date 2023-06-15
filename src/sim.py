@@ -255,7 +255,7 @@ class Sim:
                     df.to_excel(writer, sheet_name=sheet_name)
             with open(dir_path + '/values.json', 'w') as outfile:
                 dump(self.values, outfile)
-            self.environment.cgm.draw_model()
+            self.environment.bn.draw() # this was cgm
 
     def run(self, desc=None):
         if desc:
