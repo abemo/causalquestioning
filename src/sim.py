@@ -84,11 +84,13 @@ class Sim:
     def multithreaded_sim(self):
         jobs = []
         results = mp.Manager().list([None] * self.num_processes)
-        for i in range(self.num_processes):
-            job = mp.Process(target=self.sim_process, args=(results, i))
-            jobs.append(job)
-            job.start()
-        [job.join() for job in jobs]
+        proc = Process(**self.process_args(0))
+        results[0] = proc.simulate()
+        # for i in range(self.num_processes):
+        #     job = mp.Process(target=self.sim_process, args=(results, i))
+        #     jobs.append(job)
+        #     job.start()
+        # [job.join() for job in jobs]
         return results
 
     def process_args(self, index):

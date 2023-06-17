@@ -34,16 +34,18 @@ class Agent:
         len(self.contexts) if self.contexts else rand_trials
     self.cooling_rate = cooling_rate
     
-    self.my_cpts = environment.bn.get_cpts() # generate cpts here TODO generate them in BN?
+    # self.my_cpts = environment.bn.model.get_cpds() # generate cpts here TODO generate them in BN?
     # nodes in the cgm that Y is dependent on that is either X or observed by X
     # in the OG example, this is Z, X
     # but if Z is not a counfounder on Y, but only connected to Y through X,
     # Z would not be included
-    parents = {self.act_var}
-    for var in self.bn.get_ancestors(self.act_var): # this was cgm
-      if not self.bn.is_d_separated(var, self.rew_var, self.act_var): # this was cgm
-        parents.add(var)
-    self.my_cpts["rew"] = CPT(self.rew_var, parents, self.domains)
+
+    # parents = environment.bn.model.get_parents(self.act_var)
+    # parents = {self.act_var} # Axel's original code
+    # for var in self.bn.get_ancestors(self.act_var): # this was cgm
+    #   if not self.bn.is_d_separated(var, self.rew_var, self.act_var): # this was cgm
+    #     parents.add(var)
+    # self.my_cpts["rew"] = CPT(self.rew_var, parents, self.domains)
 
   def update_divergence(self):
     return
@@ -123,7 +125,7 @@ class Agent:
     The behavior of the agent returning
     """
     self.recent = sample
-    for cpt in self.my_cpts.values():
+    for cpt in self.bn.model.get_cpds().values():
       cpt.add(sample)
 
   def get_recent(self):
@@ -142,12 +144,13 @@ class Agent:
     query.assign(givens)
     for rew in self.rewards:
       query.assign(rew)
+      print(cpts)
       rew_prob = query.solve(cpts["rew"])
       summ += rew[self.rew_var] * rew_prob if rew_prob is not None else 0
     return summ
 
   def choose_optimal(self, context):
-    cpts = self.get_cpts()
+    cpts = self.bn.model.get_cpds()
     best_acts = []
     best_rew = -inf
     for act in self.actions:
@@ -205,7 +208,7 @@ class SoloAgent(Agent):
     super().__init__(*args, **kwargs)
 
   def get_cpts(self):
-    return self.my_cpts
+    return self.bn.model.get_cpts()
 
 
 class AskAgent(Agent):

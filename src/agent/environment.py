@@ -11,7 +11,6 @@ The code has been imported and modified into this project for ease/consistency
 import pandas as pd
 from util import hash_from_dict, only_given_keys, permutations
 from math import inf
-from causal_tools.scm import StructuralCausalModel
 from causal_tools.assignment_models import ActionModel
 from causal_tools.bn import BN
 
@@ -47,7 +46,7 @@ class Environment:
                        data=data, set_nodes=set_nodes)
 
         pre_nodes = list(self.bn.get_ancestors(self.act_var))
-        self.pre = StructuralCausalModel(
+        self.pre = BN(assignment=
             only_given_keys(self._assignment, pre_nodes))
         post_ass = self._assignment.copy()
         print("===========================")
@@ -56,7 +55,7 @@ class Environment:
         print("===========================")
         [post_ass.update({n: ActionModel(self.bn.get_parents(n), self.domains[n])})
          for n in pre_nodes]
-        self.post = StructuralCausalModel(post_ass)
+        self.post = BN(assignment=post_ass)
 
         self.feat_vars = self.get_feat_vars()
         self.assigned_optimal_actions()
