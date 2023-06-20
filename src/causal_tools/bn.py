@@ -12,7 +12,7 @@ from itertools import combinations, chain
 from copy import deepcopy
 from re import findall
 import random
-from causal_tools.assignment_models import ActionModel
+from causal_tools.assignment_models import ActionModel, RandomModel, DiscreteModel
 from collections.abc import Iterable
 
 class BN:
@@ -20,9 +20,25 @@ class BN:
         self.model = BayesianNetwork()
 
         if assignment is not None:
+            print("Assignment ---------------------------")
             print(assignment)
-            self.assignment = assignment
-            return # TODO learn from assignment and pre_nodes
+            for variable, cpt in assignment.items():
+                cpd = None
+                values = [cpt.prob(domain)for  domain in cpt.domain] # TODO needs to be the 2d array
+                print(values)
+                if type(cpt) is RandomModel:
+                    cpd = TabularCPD(variable, len(cpt.domain), values)
+                if type(cpt) is ActionModel:
+                    cpd = TabularCPD(variable, len(cpt.domain), values, evidence = cpt.parents)
+                if type(cpt) is DiscreteModel:
+                    cpd = TabularCPD(variable, len(cpt.domain), values, evidence = cpt.parents )
+                
+                self.model.add_node(variable)
+                self.model.add_cpds(cpd)
+                if cpt.parents is not None:
+                    for parent in cpt.parents:
+                        self.model.add_edge(parent, variable)
+            return 
 
         if nodes is not None:
             self.model.add_nodes_from(nodes)

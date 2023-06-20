@@ -144,7 +144,7 @@ class Agent:
     query.assign(givens)
     for rew in self.rewards:
       query.assign(rew)
-      print(cpts)
+      # print(cpts)
       rew_prob = query.solve(cpts["rew"])
       summ += rew[self.rew_var] * rew_prob if rew_prob is not None else 0
     return summ

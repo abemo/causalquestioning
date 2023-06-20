@@ -28,7 +28,7 @@ class Environment:
         self.rew_var = rew_var
         set_nodes = []
         edges = []
-        print(f"Assignment: {assignment}")
+        # print(f"Assignment: {assignment}")
 
         for node, model in assignment.items():
             self.domains[node] = model.domain
@@ -41,6 +41,7 @@ class Environment:
             ])
 
         # TODO: data is empty right now?
+        # TODO: generate the data from the assignment
         data = pd.DataFrame()
         self.bn = BN(nodes=nodes, edges=edges,
                        data=data, set_nodes=set_nodes)
@@ -49,10 +50,10 @@ class Environment:
         self.pre = BN(assignment=
             only_given_keys(self._assignment, pre_nodes))
         post_ass = self._assignment.copy()
-        print("===========================")
-        print(pre_nodes)
-        print("Domains: " + str(self.domains))
-        print("===========================")
+        # print("===========================")
+        # print(pre_nodes)
+        # print("Domains: " + str(self.domains))
+        # print("===========================")
         [post_ass.update({n: ActionModel(self.bn.get_parents(n), self.domains[n])})
          for n in pre_nodes]
         self.post = BN(assignment=post_ass)
