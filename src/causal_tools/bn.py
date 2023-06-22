@@ -16,30 +16,21 @@ from causal_tools.assignment_models import ActionModel, RandomModel, DiscreteMod
 from collections.abc import Iterable
 
 class BN:
-    def __init__(self, nodes=None, edges=None, assignment=None, data=None, latent_edges=[], set_nodes=[]):
+    def __init__(self, nodes=None, edges=None, data=None, latent_edges=[], set_nodes=[], cpds=[], assignment = None):
         self.model = BayesianNetwork()
 
-        if assignment is not None:
-            print("Assignment ---------------------------")
-            print(assignment)
-            for variable, cpt in assignment.items():
-                cpd = None
-                values = [cpt.prob(domain)for  domain in cpt.domain] # TODO needs to be the 2d array
-                print(values)
-                if type(cpt) is RandomModel:
-                    cpd = TabularCPD(variable, len(cpt.domain), values)
-                if type(cpt) is ActionModel:
-                    cpd = TabularCPD(variable, len(cpt.domain), values, evidence = cpt.parents)
-                if type(cpt) is DiscreteModel:
-                    cpd = TabularCPD(variable, len(cpt.domain), values, evidence = cpt.parents )
-                
-                self.model.add_node(variable)
+        if len(cpds) > 0 and assignment is not None:
+            self.assignment = assignment
+            for cpd in cpds:
+                # add the node
+                self.model.add_node(cpd.variable)
+                # add the edges for parents
+                for parent in cpd.get_evidence():
+                    self.model.add_edge(parent, cpd.variable)
+                # add the cpd
                 self.model.add_cpds(cpd)
-                if cpt.parents is not None:
-                    for parent in cpt.parents:
-                        self.model.add_edge(parent, variable)
-            return 
-
+            return
+        
         if nodes is not None:
             self.model.add_nodes_from(nodes)
         self.model.add_nodes_from(set_nodes)
@@ -55,7 +46,7 @@ class BN:
             for node in self.model.nodes():
                 self.model.add_cpds(TabularCPD(node, 2, [[1], [0]]))
         self.observed_vars = sorted(nodes + set_nodes)
-        self.draw()
+        # self.draw()
     
 
     def node_entropy(self, node) -> float:
@@ -67,10 +58,8 @@ class BN:
         shannon_entropy = 0
         for prob in cpd.get_values()[-1]:
             shannon_entropy += prob * math.log((1 / prob), 2)
-        return shannon_entropy
-
-    def get_highest_entropy_pair(self) -> tuple:
-        return max(list(combinations(self.model.nodes(), 2)), key=lambda pair: self.node_entropy(pair[0]) + self.node_entropy(pair[1]))
+        # return shannon_entropy #TODO
+        return 1
 
     def draw(self):
         dot = graphviz.Digraph()
@@ -240,12 +229,14 @@ class BN:
         -------
         samples: pd.DataFrame
         """
+        print(f"assigment: {self.assignment}")
         samples = {}
         for node in self.model.nodes: # this was cgm
             c_model = self.assignment[node]
 
             if isinstance(c_model, ActionModel):
-                samples[node] = set_values[node]
+                # samples[node] = set_values[node]
+                samples[node] = self.model.nodes[node]
             else:
                 parent_samples = {
                     parent: samples[parent]

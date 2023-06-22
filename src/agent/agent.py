@@ -8,6 +8,7 @@ from util import only_given_keys, permutations, hellinger_dist
 from causal_tools.enums import ASR
 from math import inf
 import pgmpy 
+from pgmpy.factors.discrete import TabularCPD
 
 
 class Agent:
@@ -33,12 +34,6 @@ class Agent:
     self.rand_trials_rem = [rand_trials] * \
         len(self.contexts) if self.contexts else rand_trials
     self.cooling_rate = cooling_rate
-    
-    # self.my_cpts = environment.bn.model.get_cpds() # generate cpts here TODO generate them in BN?
-    # nodes in the cgm that Y is dependent on that is either X or observed by X
-    # in the OG example, this is Z, X
-    # but if Z is not a counfounder on Y, but only connected to Y through X,
-    # Z would not be included
 
     # parents = environment.bn.model.get_parents(self.act_var)
     # parents = {self.act_var} # Axel's original code
@@ -46,12 +41,30 @@ class Agent:
     #   if not self.bn.is_d_separated(var, self.rew_var, self.act_var): # this was cgm
     #     parents.add(var)
     # self.my_cpts["rew"] = CPT(self.rew_var, parents, self.domains)
+    parents = self.bn.get_parents(self.rew_var)
+    for var in self.bn.get_ancestors(self.act_var): 
+      if not self.bn.is_d_separated(var, self.rew_var, self.act_var):
+        parents.add(var)
+    # table = {key: 0 for key in Count(self.rew_var, parents).unassigned_combos(self.domains)}
+    # print(table)
+    # for item in table.items():
+    #   print(str(item[0]))
+    # table = []
+    # for i in range(len(self.domains)):
+    #   table.append([])
+    #   for j in range(len(self.domains)**len(parents)):
+    #     table[i].append(0)
+    table = [[0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0]] # TODO
+    self.reward_cpt = TabularCPD(self.rew_var, len(self.domains), table, parents, [2 for _ in range(len(parents))])
 
   def update_divergence(self):
     return
 
   def get_context(self):
-    return only_given_keys(self.domains, self.bn.get_parents(self.act_var)) # this was cgm
+    return only_given_keys(self.domains, self.bn.get_parents(self.act_var))
 
   def get_ind_var_value(self, ind_var):
     """
@@ -145,7 +158,7 @@ class Agent:
     for rew in self.rewards:
       query.assign(rew)
       # print(cpts)
-      rew_prob = query.solve(cpts["rew"])
+      rew_prob = query.solve(self.reward_cpt)
       summ += rew[self.rew_var] * rew_prob if rew_prob is not None else 0
     return summ
 

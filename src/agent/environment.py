@@ -16,11 +16,12 @@ from causal_tools.bn import BN
 
 
 class Environment:
-    def __init__(self, assignment, rew_var="Y"):
+    def __init__(self, assignment, rew_var="Y", cpds=[]):
         """
         Creates StructuralCausalModel from assignment of the form
         { variable: Function(parents) }
         """
+        self.cpds =cpds
         self.domains = {}
         self._assignment = assignment.copy()
         nodes = list(assignment.keys())
@@ -47,8 +48,9 @@ class Environment:
                        data=data, set_nodes=set_nodes)
 
         pre_nodes = list(self.bn.get_ancestors(self.act_var))
-        self.pre = BN(assignment=
-            only_given_keys(self._assignment, pre_nodes))
+        # print("+=========================+")
+        # print(f"Pre Nodes: {pre_nodes}\nass:{only_given_keys(self._assignment, pre_nodes)}")
+        self.pre = BN(cpds=[cpd for cpd in cpds if cpd.variable in pre_nodes],assignment=only_given_keys(self._assignment, pre_nodes))
         post_ass = self._assignment.copy()
         # print("===========================")
         # print(pre_nodes)
@@ -56,7 +58,7 @@ class Environment:
         # print("===========================")
         [post_ass.update({n: ActionModel(self.bn.get_parents(n), self.domains[n])})
          for n in pre_nodes]
-        self.post = BN(assignment=post_ass)
+        self.post = BN(cpds=cpds, assignment=post_ass)
 
         self.feat_vars = self.get_feat_vars()
         self.assigned_optimal_actions()

@@ -16,16 +16,16 @@ from json import dump
 from causal_tools.enums import OTP, ASR
 from process import Process
 from itertools import combinations_with_replacement
-
+from pgmpy.factors.discrete import TabularCPD
 
 class Sim:
-    def __init__(self, environment_dict, otp, tau, asr, T, mc_sims, EG_epsilon=0, EF_rand_trials=0, ED_cooling_rate=0, is_community=False, rand_envs=False, node_mutation_chance=0, show=True, save=False, seed=None):
+    def __init__(self, environment_dict, otp, tau, asr, T, mc_sims, EG_epsilon=0, EF_rand_trials=0, ED_cooling_rate=0, is_community=False, rand_envs=False, node_mutation_chance=0, show=True, save=False, seed=None, cpds=[]):
         asr = tuple(tuple(e) for e in asr) if isinstance(
             asr, combinations_with_replacement) else asr
         self.start_time = time.time()
         self.rand_envs = rand_envs
         self.nmc = node_mutation_chance
-        self.environment = Environment(environment_dict)
+        self.environment = Environment(environment_dict, cpds=cpds)
         self.num_agents = 1
         self.assignments = self.get_assignments(
             otp, tau, asr, EG_epsilon, EF_rand_trials, ED_cooling_rate)
@@ -294,6 +294,14 @@ if __name__ == "__main__":
         "W": DiscreteModel(("X"), {(0,): (0.75, 0.25), (1,): (0.25, 0.75)}),
         "Y": DiscreteModel(("Z", "W"), {(0, 0): (0.8, 0.2), (0, 1): (0.5, 0.5), (1, 0): (0.5, 0.5), (1, 1): (0.2, 0.8)})
     }
+    cpd_Z = TabularCPD("Z", 2, [[0.5], [0.5]])
+    cpd_X = TabularCPD("X", 2, [[0], [1]])
+    cpd_W = TabularCPD("W", 2,[[0.75,0.25],[0.25, 0.75]], ["X"], [2])
+    cpd_Y = TabularCPD("Y", 2,[[0.8, 0.5, 0.5, 0.2], [0.2, 0.5, 0.5, 0.8]],["Z", "W"],[2,2])
+    
+    
+    cpd_list = [cpd_Z, cpd_X, cpd_W, cpd_Y]
+    
     reversed_w = dict(baseline)
     reversed_w["W"] = DiscreteModel(
         ("X"), {(0,): (0.25, 0.75), (1,): (0.75, 0.25)})
@@ -325,6 +333,7 @@ if __name__ == "__main__":
         node_mutation_chance=(0.2, 0.8),
         show=True,
         save=True,
-        seed=420
+        seed=420,
+        cpds=cpd_list
     )
     experiment.run(desc="0208ASR_community_LETSGO_1")
